@@ -10,7 +10,6 @@
 #define SAMPLE_RATE (44100)
 #define FFT_SIZE (8192)
 #define RESULT (FFT_SIZE/2)
-
 #define MQTT_TOPIC "sound"
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883

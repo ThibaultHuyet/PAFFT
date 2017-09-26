@@ -1,6 +1,6 @@
 CC = g++
-OBJ = pafft.cpp
+SRC = $(wildcard src/*.cpp)
 LIBS = -lrt -lm -lasound -lpthread -lportaudio -lfftw3f -lm -lmosquitto
 
-main: $(OBJ)
-	$(CC) $(OBJ) $(LIBS) -o main
+main: $(SRC)
+	$(CC) $(SRC) $(LIBS) -o main
