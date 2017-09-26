@@ -1,17 +1,12 @@
-#include <stdio.h>
-#include <stdbool.h>
 #include <cmath>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fftw3.h>
 #include <portaudio.h>
 #include <iostream>
 #include <fstream>
 #include <mosquitto.h>
-#include "json.hpp"
-#include <iterator>
 #include <string>
-
-using json = nlohmann::json;
+#include <cstring>
 
 #define SAMPLE_RATE (44100)
 #define FFT_SIZE (8192)
@@ -23,6 +18,9 @@ using json = nlohmann::json;
 
 std::string convert(float *arr, int size)
 {
+    // I am converting the float array to a
+    // string so that I can send it via MQTT
+
     std::string ret;
     std::string temp;
     ret.append("[");
@@ -66,25 +64,8 @@ void apply_window(float *window, float *data, int size)
     }
 }
 
-void write_file(fftwf_complex* out)
-{
-    std::ofstream file;
-    file.open("fft.csv");
-
-    for (int i = 0; i < FFT_SIZE; i++)
-    {
-        float mag = sqrt(out[i][0] * out[i][0]
-                        + out[i][1] * out[i][1]
-                        );
-
-        file << mag << "," << i*5.38 <<"\n";
-    }
-}
-
 int main()
 {
-    int hey[] = {42, 69, 420};
-
     // Initialize the mosquitto that will be used
     struct mosquitto *mosq = nullptr;
     mosquitto_lib_init();
@@ -154,7 +135,14 @@ int main()
         apply_window(window, data, FFT_SIZE);
         fftwf_execute(plan);
 
+        // Function computes the magnitude of each
+        // complex number and creates a new array
         mag(out, message, FFT_SIZE);
+
+        // What follows is a very hacky way of making an easy to parse format
+        // That I can send via MQTT
+        // It works but there are very likely better ways to do this
+        // On the receiver's side, I do need to unpack the string
         int size = FFT_SIZE/2;
         std::string msg = convert(message, size);
         const char *c = msg.c_str();
@@ -162,10 +150,17 @@ int main()
 
 
         ret = mosquitto_publish(
-                mosq, nullptr, MQTT_TOPIC,
-                msgLen, c, 0, false
+                                mosq,               // Initialized with mosquitto_lib_init
+                                nullptr,            // int *mid
+                                MQTT_TOPIC,         // Topic to publish to
+                                msgLen,             // int payload length
+                                c,                  // Message being sent
+                                0,                  // Quality of Service
+                                false               // Retain message
                                 );
         
+        // If mqtt doesn manage a succesful publish
+        // There is an error and program should end
         if (ret)
         {
             exit(-1);
