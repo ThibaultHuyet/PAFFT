@@ -9,10 +9,12 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 
 ### Python
 1. [Plotly](https://plot.ly/)
-2. MQTT (Eventually)
+2. [MQTT](http://www.eclipse.org/paho/)
 
 ## To Do
 1. I need to choose either c or c++ and stick to the style. The code right now is a cross between the two and quite ugly.
 2. Add this to a Raspberry Pi.
 3. Test this in a Docker container.
 4. Better graphing.
+5. Maybe store this in a MongoDB database
+6. Run Python side on AWS

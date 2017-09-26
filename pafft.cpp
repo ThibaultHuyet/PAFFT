@@ -7,6 +7,11 @@
 #include <iostream>
 #include <fstream>
 #include <mosquitto.h>
+#include "json.hpp"
+#include <iterator>
+#include <string>
+
+using json = nlohmann::json;
 
 #define SAMPLE_RATE (44100)
 #define FFT_SIZE (8192)
@@ -16,10 +21,23 @@
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 
+std::string convert(float *arr, int size)
+{
+    std::string ret;
+    std::string temp;
+    ret.append("[");
+    for (int i = 0; i < size; i++)
+    {
+        temp = std::to_string(arr[i]);
+        ret.append(temp + ", ");
+    }
+    ret.append("]");
+    return ret;
+}
 
 void mag(fftwf_complex *out, float *data, int size)
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size/2; i++)
     {
         data[i] = sqrt(out[i][0] * out[i][0]
                         + out[i][1] * out[i][1]);
@@ -65,6 +83,8 @@ void write_file(fftwf_complex* out)
 
 int main()
 {
+    int hey[] = {42, 69, 420};
+
     // Initialize the mosquitto that will be used
     struct mosquitto *mosq = nullptr;
     mosquitto_lib_init();
@@ -89,8 +109,8 @@ int main()
     // data will be the input to fft
     // out will be the output
     float data[FFT_SIZE];
-    fftwf_complex out[FFT_SIZE];
-    float message[FFT_SIZE];
+    fftwf_complex out[FFT_SIZE/2];
+    float message[FFT_SIZE/2];
 
     // Initialize PortAudio
     err = Pa_Initialize();
@@ -135,9 +155,15 @@ int main()
         fftwf_execute(plan);
 
         mag(out, message, FFT_SIZE);
+        int size = FFT_SIZE/2;
+        std::string msg = convert(message, size);
+        const char *c = msg.c_str();
+        int msgLen = strlen(c);
+
+
         ret = mosquitto_publish(
                 mosq, nullptr, MQTT_TOPIC,
-                FFT_SIZE, message, 0, false
+                msgLen, c, 0, false
                                 );
         
         if (ret)
