@@ -6,11 +6,25 @@
 #include <portaudio.h>
 #include <iostream>
 #include <fstream>
-
+#include <mosquitto.h>
 
 #define SAMPLE_RATE (44100)
 #define FFT_SIZE (8192)
 #define RESULT (FFT_SIZE/2)
+
+#define MQTT_TOPIC "sound"
+#define MQTT_HOSTNAME "localhost"
+#define MQTT_PORT 1883
+
+
+void mag(fftwf_complex *out, float *data, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        data[i] = sqrt(out[i][0] * out[i][0]
+                        + out[i][1] * out[i][1]);
+    }
+}
 
 void build_window(float *window, int size)
 {
@@ -51,6 +65,22 @@ void write_file(fftwf_complex* out)
 
 int main()
 {
+    // Initialize the mosquitto that will be used
+    struct mosquitto *mosq = nullptr;
+    mosquitto_lib_init();
+
+    mosq = mosquitto_new(nullptr, true, nullptr);
+    if (!mosq)
+    {
+        exit(-1);
+    }
+
+    int ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 0);
+    if (ret)
+    {
+        exit(-1);
+    }
+
     PaStreamParameters inputParameters;                 // Input parameters for working with PortAudio
     PaError err = 0;                                    // err is for error checking
     PaStream *stream;                                   // Stream object created by PortAudio
@@ -60,6 +90,7 @@ int main()
     // out will be the output
     float data[FFT_SIZE];
     fftwf_complex out[FFT_SIZE];
+    float message[FFT_SIZE];
 
     // Initialize PortAudio
     err = Pa_Initialize();
@@ -67,7 +98,6 @@ int main()
 
     // The window array
     float window[FFT_SIZE];
-    
     // populate the window with the Welch function
     build_window(window, FFT_SIZE);
 
@@ -100,25 +130,43 @@ int main()
         fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
+
         apply_window(window, data, FFT_SIZE);
         fftwf_execute(plan);
 
-        write_file(out);
+        mag(out, message, FFT_SIZE);
+        ret = mosquitto_publish(
+                mosq, nullptr, MQTT_TOPIC,
+                FFT_SIZE, message, 0, false
+                                );
+        
+        if (ret)
+        {
+            exit(-1);
+        }
+
+        // write_file(out);
         // For now this is going to be 1 second but in the actual code I would like this to be 5 seconds
-        Pa_Sleep(1000);
+        Pa_Sleep(5000);
     }
 
     err = Pa_Terminate();
     if (err != paNoError)
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 
+    mosquitto_disconnect (mosq);
+    mosquitto_destroy (mosq);
+    mosquitto_lib_cleanup();
+    
     error:
         if( stream )
         {
             Pa_AbortStream( stream );
             Pa_CloseStream( stream );
         }
-
+    mosquitto_disconnect (mosq);
+    mosquitto_destroy (mosq);
+    mosquitto_lib_cleanup();
 
     return 0;
 }
