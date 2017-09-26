@@ -3,7 +3,6 @@
 #include <fftw3.h>
 #include <portaudio.h>
 #include <iostream>
-#include <fstream>
 #include <mosquitto.h>
 #include <string>
 #include <cstring>
