@@ -2,7 +2,12 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 import math
 import paho.mqtt.client as mqtt
-import codecs
+import numpy as np
+
+
+Fs = 44100
+Ts = 1.0/Fs
+
 
 # mag is storing the mqtt messages
 mag = []
@@ -24,10 +29,17 @@ def on_message(client, userdata, msg):
     temp = temp[3:-4]
     result = temp.split(',')
 
+    n = len(result)
+    k = np.arange(n)
+    T = n/Fs
+    frq = k/T
+
     # This isn a great idea but for the sake of simplicity
     # I'm making a new graph with every result
     # Don run this for a long time or you will have a lot of graphs
+
     trace = go.Scatter(
+                    x = frq,
                     y = result
                     )
 

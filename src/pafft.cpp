@@ -8,11 +8,43 @@
 #include <cstring>
 
 #define SAMPLE_RATE (44100)
+
 #define FFT_SIZE (8192)
 #define RESULT (FFT_SIZE/2)
+
 #define MQTT_TOPIC "sound"
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
+
+// void computeSecondOrderLowPassParameters( float srate, float f, float *a, float *b )
+// {
+//    float a0;
+//    float w0 = 2 * M_PI * f/srate;
+//    float cosw0 = cos(w0);
+//    float sinw0 = sin(w0);
+//    //float alpha = sinw0/2;
+//    float alpha = sinw0/2 * sqrt(2);
+
+//    a0   = 1 + alpha;
+//    a[0] = (-2*cosw0) / a0;
+//    a[1] = (1 - alpha) / a0;
+//    b[0] = ((1-cosw0)/2) / a0;
+//    b[1] = ( 1-cosw0) / a0;
+//    b[2] = b[0];
+// }
+
+// float processSecondOrderFilter( float x, float *mem, float *a, float *b )
+// {
+//     float ret = b[0] * x + b[1] * mem[0] + b[2] * mem[1]
+//                          - a[0] * mem[2] - a[1] * mem[3] ;
+
+// 		mem[1] = mem[0];
+// 		mem[0] = x;
+// 		mem[3] = mem[2];
+// 		mem[2] = ret;
+
+// 		return ret;
+// }
 
 std::string convert(float *arr, int size)
 {
@@ -63,6 +95,9 @@ void apply_window(float *window, float *data, int size)
 
 int main()
 {
+    float a[2], b[3], mem1[4], mem2[4];
+
+    // computeSecondOrderLowPassParameters(SAMPLE_RATE, 3700, a, b);
     // Initialize the mosquitto that will be used
     struct mosquitto *mosq = nullptr;
     mosquitto_lib_init();
@@ -129,19 +164,24 @@ int main()
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
 
-        apply_window(window, data, FFT_SIZE);
+        // for (int j = 0; j < FFT_SIZE; j++)
+        // {
+        //     data[j] = processSecondOrderFilter(data[j], mem1, a, b);
+        //     data[j] = processSecondOrderFilter(data[j], mem2, a, b);
+        // }
+
+        apply_window(window, data, RESULT);
         fftwf_execute(plan);
 
         // Function computes the magnitude of each
         // complex number and creates a new array
-        mag(out, message, FFT_SIZE);
+        mag(out, message, RESULT);
 
         // What follows is a very hacky way of making an easy to parse format
         // That I can send via MQTT
         // It works but there are very likely better ways to do this
         // On the receiver's side, I do need to unpack the string
-        int size = FFT_SIZE/2;
-        std::string msg = convert(message, size);
+        std::string msg = convert(message, RESULT);
         const char *c = msg.c_str();
         int msgLen = strlen(c);
 
