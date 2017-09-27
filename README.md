@@ -18,3 +18,6 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 4. Better graphing.
 5. Maybe store this in a MongoDB database
 6. Run Python side on AWS
+
+## Bugs
+1. Something about the fft graphing isn't working properly. PRoblem is either on the magnitude function or in the actual graphing. Must research/discuss on how exactly the output of the fft transfrom should be interpreted. Look into how other people have graphed fft transforms and if it has been done in Plotly.
