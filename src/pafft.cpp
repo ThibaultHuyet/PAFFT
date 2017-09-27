@@ -18,7 +18,6 @@ std::string convert(float *arr, int size)
 {
     // I am converting the float array to a
     // string so that I can send it via MQTT
-
     std::string ret;
     std::string temp;
     ret.append("[");
