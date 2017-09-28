@@ -1,13 +1,12 @@
 import plotly.plotly as py
 import plotly.graph_objs as go
-import math
 import paho.mqtt.client as mqtt
 import numpy as np
 
 
 Fs = 44100
 Ts = 1.0/Fs
-
+i = 0
 
 # mag is storing the mqtt messages
 mag = []
@@ -28,8 +27,9 @@ def on_message(client, userdata, msg):
     # end 4 char before end because I added , ] and mqtt adds something?
     temp = temp[3:-4]
     result = temp.split(',')
-
     n = len(result)
+
+    final = [float(x)/n for x in result]
     k = np.arange(n)
     T = n/Fs
     frq = k/T
@@ -40,11 +40,16 @@ def on_message(client, userdata, msg):
 
     trace = go.Scatter(
                     x = frq,
-                    y = result
+                    y = final
                     )
 
     data = [trace]
-    py.plot(data, filename = 'basic_line')
+    layout = go.Layout(
+                # Limiting range just to where human voice has most effect
+                xaxis = dict(range = [0, 20000])
+    )
+    fig = go.Figure(data = data, layout = layout)
+    py.plot(fig, filename = "Speech: {}".format(i))
 
 # Defining the client and assigning the callback methods defined above
 client = mqtt.Client()
