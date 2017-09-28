@@ -25,6 +25,7 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 ## Graphs
 ### Graph of fft output
 Note that this is restricted between 50 Hz and 3000 Hz
+
 Graphs made on 28th September
 <div>
     <a href="https://plot.ly/~ThibaultHuyet/94/?share_key=s3pS5zEYxPadnJVijDwscc" target="_blank" title="plot from API (37)" style="display: block; text-align: center;"><img src="https://plot.ly/~ThibaultHuyet/94.png?share_key=s3pS5zEYxPadnJVijDwscc" alt="plot from API (37)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
