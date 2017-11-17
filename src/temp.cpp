@@ -23,7 +23,7 @@ using json = nlohmann::json;
 
 int main()
 	{
-		time_t result = time(nullptr);
+		time_t result;
 
 		struct mosquitto *mosq = nullptr;
 	    mosquitto_lib_init();
@@ -45,6 +45,7 @@ int main()
 	    while (count < 100)
 	    	{
 	    		j["count"] = count;
+		        result = time(nullptr);
 	    		auto t = asctime(localtime(&result));
 	    		j["time"] = t;
 
