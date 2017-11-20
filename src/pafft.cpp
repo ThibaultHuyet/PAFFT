@@ -1,13 +1,9 @@
-#include <cmath>
-#include <cstdlib>
-#include <fftw3.h>
-#include <portaudio.h>
-#include <iostream>
-#include <mosquitto.h>
-#include <string>
-#include <cstring>
+#include <fftw3.h>                      // For performing fft
+#include <portaudio.h>                  // For audio sampling
+#include <mosquitto.h>                  // For sending data
+#include <string>                       // Making a message to be sent
 #include "lib.h"
-#include "json.hpp"
+#include "json.hpp"                     // Converting to JSON data
 
 using json = nlohmann::json;
 
@@ -22,9 +18,6 @@ using json = nlohmann::json;
 
 int main()
 {
-    float a[2], b[3], mem1[4], mem2[4];
-
-    // computeSecondOrderLowPassParameters(SAMPLE_RATE, 3700, a, b);
     // Initialize the mosquitto that will be used
     struct mosquitto *mosq = nullptr;
     mosquitto_lib_init();
@@ -93,12 +86,6 @@ int main()
         fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
-
-        // for (int j = 0; j < FFT_SIZE; j++)
-        // {
-        //     data[j] = processSecondOrderFilter(data[j], mem1, a, b);
-        //     data[j] = processSecondOrderFilter(data[j], mem2, a, b);
-        // }
 
         apply_window(window, data, RESULT);
         fftwf_execute(plan);
