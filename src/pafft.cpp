@@ -78,7 +78,6 @@ int main()
     if (err != paNoError) goto error;
 
     
-
     while (true)
     {
         json j; // Message to be sent
@@ -103,10 +102,6 @@ int main()
         std::string msg = j.dump(); // Convert JSON value into string
         auto payload = msg.data(); // Convert into binary/c-string data
         int msgLen = msg.length();
-        // std::string msg = convert(message, RESULT);
-        // const char *c = msg.c_str();
-        // int msgLen = strlen(c);
-
 
         ret = mosquitto_publish(
                                 mosq,               // Initialized with mosquitto_lib_init
