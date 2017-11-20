@@ -2,6 +2,7 @@
 #include <portaudio.h>                  // For audio sampling
 #include <mosquitto.h>                  // For sending data
 #include <string>                       // Making a message to be sent
+#include <ctime>
 #include "lib.h"
 #include "json.hpp"                     // Converting to JSON data
 
@@ -80,7 +81,16 @@ int main()
     
     while (true)
     {
-        json j; // Message to be sent
+        json j;                 // Message to be sent
+        time_t result;          // For sending time data was taken
+        
+        // Take current time and add to JSON data
+        // Not too happy right now with time format
+        // Will fix later
+        result = time(nullptr);
+        auto t = asctime(localtime(&result));
+        j["time"] = t;
+
         // Create the fftw plan
         fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
         // Pa_ReadStream is a blocking call to take in mic input
