@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -y \
     libasound-dev \
     mosquitto \
     mosquitto-clients \
-    mosquitto-dev \
+    libmosquitto-dev \
     portaudio19-dev
 
-ADD fftw-3.37.tar.gz
-RUN cd fftw-3.37 \
+ADD fftw-3.3.7.tar.gz /
+RUN cd fftw-3.3.7 \
     && ./configure --enable-float && make \
     && make install
 
