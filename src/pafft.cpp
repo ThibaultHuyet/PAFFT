@@ -7,6 +7,9 @@
 #include <string>
 #include <cstring>
 #include "lib.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 #define SAMPLE_RATE (44100)
 
@@ -14,7 +17,6 @@
 #define RESULT (FFT_SIZE/2)
 
 #define MQTT_TOPIC "sound"
-#define SPEECH "speech"
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 
@@ -82,8 +84,11 @@ int main()
     err = Pa_StartStream(stream);
     if (err != paNoError) goto error;
 
+    
+
     while (true)
     {
+        json j; // Message to be sent
         // Create the fftw plan
         fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
         // Pa_ReadStream is a blocking call to take in mic input
@@ -106,9 +111,14 @@ int main()
         // That I can send via MQTT
         // It works but there are very likely better ways to do this
         // On the receiver's side, I do need to unpack the string
-        std::string msg = convert(message, RESULT);
-        const char *c = msg.c_str();
-        int msgLen = strlen(c);
+        
+        j["mag"] = message;
+        std::string msg = j.dump(); // Convert JSON value into string
+        auto payload = msg.data(); // Convert into binary/c-string data
+        int msgLen = msg.length();
+        // std::string msg = convert(message, RESULT);
+        // const char *c = msg.c_str();
+        // int msgLen = strlen(c);
 
 
         ret = mosquitto_publish(
@@ -116,26 +126,10 @@ int main()
                                 nullptr,            // int *mid
                                 MQTT_TOPIC,         // Topic to publish to
                                 msgLen,             // int payload length
-                                c,                  // Message being sent
+                                payload,                  // Message being sent
                                 0,                  // Quality of Service
                                 false               // Retain message
-                                );
-
-        // I'm also sending the speech data for testing/debugging purposes
-        // This will not be in the final version
-        std::string m = convert(data, FFT_SIZE);
-        const char *s = msg.c_str();
-        int len = strlen(c);
-
-        ret = mosquitto_publish(
-                                mosq,               // Initialized with mosquitto_lib_init
-                                nullptr,            // int *mid
-                                SPEECH,           // Topic to publish to
-                                len,                // int payload length
-                                s,                  // Message being sent
-                                0,                  // Quality of Service
-                                false               // Retain message
-                                );                    
+                                );  
 
         // If mqtt doesn manage a succesful publish
         // There is an error and program should end

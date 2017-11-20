@@ -27,9 +27,10 @@ def on_message(client, userdata, msg):
     # end 4 char before end because I added , ] and mqtt adds something?
     temp = temp[3:-4]
     result = temp.split(',')
+    
     n = len(result)
-
-    final = [float(x)/n for x in result]
+    norm = [float(x)/n for x in result]
+    final = 20 * np.log10(norm)
     k = np.arange(n)
     T = n/Fs
     frq = k/T
@@ -46,10 +47,31 @@ def on_message(client, userdata, msg):
     data = [trace]
     layout = go.Layout(
                 # Limiting range just to where human voice has most effect
-                xaxis = dict(range = [0, 20000])
+                xaxis = dict(
+                            type = 'log',
+                            range = [1, 4.3010],
+                            title = "Frequency (Hz)",
+                            rangemode = "normal",
+                            exponentformat = "B",
+                            showgrid = True,
+                            anchor = "y",
+                            ticks = "inside",
+                            nticks = 50, 
+                            autorange = False,
+                            showexponent = "all"
+                            ),
+                yaxis = dict(
+                            title = "Amplitude (dB)",
+                            ticks = "inside",
+                            showgrid = True,
+                            rangemode = "normal",
+                            range = [-120, 0],
+                            showexponent = "all",
+                            exponentformat = "B"
+                            )
     )
     fig = go.Figure(data = data, layout = layout)
-    py.plot(fig, filename = "Speech: {}".format(i))
+    py.plot(fig)
 
 # Defining the client and assigning the callback methods defined above
 client = mqtt.Client()
@@ -58,14 +80,3 @@ client.on_message = on_message
 
 client.connect('localhost')
 client.loop_forever()
-
-
-# for i, value in enumerate(mag):
-#     if (math.isnan(float(value))):
-#         mag[i] = 0
-#     elif (math.isinf(float(value))):
-#         mag[i] = 0
-#     elif (float(value) > 1000):
-#         mag[i] = 0
-#     else:
-#         mag[i] = float(value)
