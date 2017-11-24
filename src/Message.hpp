@@ -19,4 +19,6 @@ class Message
         
     private:
         json j;
+        int length;
+        std::string msg; // String formatted version for convenience
 };

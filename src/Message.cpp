@@ -8,6 +8,8 @@ Message::Message(float *data, int size)
         j["mag"].push_back(data[i]);
     }
 
+    msg = j.dump();
+    length = msg.length();
 }
 
 Message::Message(float *data, int size, time_t result)
@@ -20,6 +22,9 @@ Message::Message(float *data, int size, time_t result)
 
     auto t = asctime(localtime(&result));
     j["time"] = t;
+
+    msg = j.dump();
+    length = msg.length();
 }
 
 Message::Message(float *data, int size, time_t result, int temperature)
@@ -34,21 +39,22 @@ Message::Message(float *data, int size, time_t result, int temperature)
     j["time"] = t;
 
     j["temp"] = temperature;
+
+    msg = j.dump();
+    length = msg.length();
 }
 
 const char* Message::get_message()
 {
-    std::string msg = j.dump();
     return msg.data();
 }
 
 std::string Message::get_string()
 {
-    return j.dump();
+    return msg;
 }
 
 int Message::get_length()
 {
-    std::string msg = j.dump();
-    return msg.length();
+    return length;
 }
