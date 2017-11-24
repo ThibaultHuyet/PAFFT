@@ -2,22 +2,6 @@
 #include <string>
 #include <cmath>
 
-std::string convert(float *arr, int size)
-{
-    // I am converting the float array to a
-    // string so that I can send it via MQTT
-    std::string ret;
-    std::string temp;
-    ret.append("[");
-    for (int i = 0; i < size; i++)
-    {
-        temp = std::to_string(arr[i]);
-        ret.append(temp + ", ");
-    }
-    ret.append("]");
-    return ret;
-}
-
 void mag(fftwf_complex *out, float *data, int size)
 {
     for (int i = 0; i < size/2; i++)
