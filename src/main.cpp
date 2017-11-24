@@ -7,8 +7,6 @@
 #include "lib.h"
 #include "Message.hpp"
 
-using json = nlohmann::json;
-
 #define SAMPLE_RATE (44100)
 
 #define FFT_SIZE (8192)
