@@ -2,36 +2,6 @@
 #include <string>
 #include <cmath>
 
-void computeSecondOrderLowPassParameters( float srate, float f, float *a, float *b )
-{
-   float a0;
-   float w0 = 2 * M_PI * f/srate;
-   float cosw0 = cos(w0);
-   float sinw0 = sin(w0);
-   //float alpha = sinw0/2;
-   float alpha = sinw0/2 * sqrt(2);
-
-   a0   = 1 + alpha;
-   a[0] = (-2*cosw0) / a0;
-   a[1] = (1 - alpha) / a0;
-   b[0] = ((1-cosw0)/2) / a0;
-   b[1] = ( 1-cosw0) / a0;
-   b[2] = b[0];
-}
-
-float processSecondOrderFilter( float x, float *mem, float *a, float *b )
-{
-    float ret = b[0] * x + b[1] * mem[0] + b[2] * mem[1]
-                         - a[0] * mem[2] - a[1] * mem[3] ;
-
-		mem[1] = mem[0];
-		mem[0] = x;
-		mem[3] = mem[2];
-		mem[2] = ret;
-
-		return ret;
-}
-
 std::string convert(float *arr, int size)
 {
     // I am converting the float array to a
