@@ -99,12 +99,6 @@ int main()
 
         // Here, I prepare the message that will be sent over MQTT
         Message m(message, RESULT, result);
-
-        // What follows is a very hacky way of making an easy to parse format
-        // That I can send via MQTT
-        // It works but there are very likely better ways to do this
-        // On the receiver's side, I do need to unpack the string
-        
         auto payload = m.get_message();
         int msgLen = m.get_length();
 
