@@ -5,7 +5,6 @@
 #include <ctime>
 
 #include "lib.h"
-#include "json.hpp"                     // Converting to JSON data
 #include "Message.hpp"
 
 using json = nlohmann::json;
@@ -87,6 +86,7 @@ int main()
 
         // Create the fftw plan
         fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
+        
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
 
