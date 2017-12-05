@@ -20,8 +20,11 @@ Message::Message(float *data, int size, bool ctime)
         j["mag"].push_back(data[i]);
     }
 
-    auto t = time(nullptr);
-    j["time"] = t;
+    if (ctime)
+    {
+        auto t = time(nullptr);
+        j["time"] = t;
+    }
 
     msg = j.dump();
     length = msg.length();
@@ -35,8 +38,11 @@ Message::Message(float *data, int size, bool ctime, int temperature)
         j["mag"].push_back(data[i]);
     }
 
-    auto t = time(nullptr);
-    j["time"] = t;
+    if (ctime)
+    {
+        auto t = time(nullptr);
+        j["time"] = t;
+    }
 
     j["temp"] = temperature;
 
