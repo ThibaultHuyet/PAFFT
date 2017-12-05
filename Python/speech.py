@@ -1,24 +1,22 @@
-import plotly.plotly as py
-import plotly.graph_objs as go
+import json
+import matplotlib.pyplot as plt
 import paho.mqtt.client as mqtt
 
+
 def on_connect(client, userdata, flags, rc):
-    client.subscribe('speech')
+    """
+    Subscribes to sound topic
+    """
+    client.subscribe('sound')
 
 def on_message(client, userdata, msg):
-    temp = str(msg.payload)
-    temp = temp[3:-4]
-    result = temp.split(',')
-    n = len(result)
-
-    trace = go.Scatter(
-                    x = n,
-                    y = result
-                        )
-    
-    data = [trace]
-    fig = go.Figure(data = data)
-    py.plot(fig, filename = "Speech wave")
+    """
+    Deals with what happens when receiving a message
+    I want this to push this to a database
+    """
+    j = json.loads(msg.payload)
+    plt.plot(j['mag'])
+    plt.show()
 
 client = mqtt.Client()
 client.on_connect = on_connect
