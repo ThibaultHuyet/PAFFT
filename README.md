@@ -13,14 +13,14 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 
 ## To Do
 1. I need to choose either c or c++ and stick to the style. The code right now is a cross between the two and quite ugly.
-2. Add this to a Raspberry Pi.
-3. Test this in a Docker container.
-4. Better graphing.
-5. Maybe store this in a MongoDB database
-6. Run Python side on AWS
+2. Better graphing.
+3. Maybe store this in a MongoDB database
+4. Run Python side on AWS
 
 ## Bugs
-1. Dockerfile won't compile properly. Error while loading shared libraries, cannot open shared library object portaudio.so
+1. There seems to be an issue with Jackd server just not starting after a while of using Docker or program. To fix, you can just use the command jackd -d dummy. jackd -d alsa has bugs for some reason.
+2. Also must use pulseaudio -D
+3. portaudio has issues getting defaults. Need to edit config files. [Solution](https://www.raspberrypi.org/forums/viewtopic.php?t=136974)
 
 ## Graphs
 ### Graph of fft output
