@@ -15,7 +15,11 @@ def on_message(client, userdata, msg):
     I want this to push this to a database
     """
     j = json.loads(msg.payload)
-    plt.plot(j['mag'])
+
+    maxj = max(j['mag'])
+    normj = [x / maxj for x in j['mag']]
+
+    plt.plot(normj)
     plt.show()
 
 client = mqtt.Client()
