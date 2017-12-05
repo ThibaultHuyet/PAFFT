@@ -12,7 +12,7 @@ Message::Message(float *data, int size)
     length = msg.length();
 }
 
-Message::Message(float *data, int size, time_t result)
+Message::Message(float *data, int size, bool ctime)
 {
     j["mag"] = {};
     for (auto i = 0; i < size; i++)
@@ -20,14 +20,14 @@ Message::Message(float *data, int size, time_t result)
         j["mag"].push_back(data[i]);
     }
 
-    auto t = asctime(localtime(&result));
+    auto t = time(nullptr);
     j["time"] = t;
 
     msg = j.dump();
     length = msg.length();
 }
 
-Message::Message(float *data, int size, time_t result, int temperature)
+Message::Message(float *data, int size, bool ctime, int temperature)
 {
     j["mag"] = {};
     for (auto i = 0; i < size; i++)
@@ -35,7 +35,7 @@ Message::Message(float *data, int size, time_t result, int temperature)
         j["mag"].push_back(data[i]);
     }
 
-    auto t = asctime(localtime(&result));
+    auto t = time(nullptr);
     j["time"] = t;
 
     j["temp"] = temperature;
@@ -53,6 +53,13 @@ std::string Message::get_string()
 {
     return msg;
 }
+
+std::ostream& operator<<(std::ostream& os, const Message& m)
+{
+    os << m.j;
+    return os;
+}
+
 
 int Message::get_length()
 {

@@ -3,7 +3,7 @@
 #include <mosquitto.h>                  // For sending data
 #include <string>                       // Making a message to be sent
 #include <ctime>
-
+#include <iostream>
 #include "lib.h"
 #include "Message.hpp"
 
@@ -49,11 +49,6 @@ int main()
     err = Pa_Initialize();
     if (err != paNoError) goto error;
 
-    // The window array
-    float window[FFT_SIZE];
-    // populate the window with the Welch function
-    build_window(window, FFT_SIZE);
-
     // Define the kind of input devcie that we will be using for taking in audio
     inputParameters.device = Pa_GetDefaultInputDevice();
     inputParameters.channelCount = 1;
@@ -88,10 +83,6 @@ int main()
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
 
-        // Something is wrong with the window function at the moment.
-        // Gonna have to come back to it later.
-        // Probably not really needed honestly
-        // apply_window(window, data, RESULT);
         fftwf_execute(plan);
 
         // Function computes the magnitude of each
@@ -99,7 +90,7 @@ int main()
         mag(out, message, RESULT);
 
         // Here, I prepare the message that will be sent over MQTT
-        Message m(message, RESULT, result);
+        Message m(message, RESULT, true);
         auto payload = m.get_message();
         int msgLen = m.get_length();
 

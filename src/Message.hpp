@@ -1,6 +1,9 @@
 #pragma once
 
 #include "json.hpp"
+
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -10,13 +13,16 @@ class Message
 {
     public:
         Message(float *data, int size);
-        Message(float *data, int size, time_t result);
-        Message(float *data, int size, time_t result, int temperature);
+        Message(float *data, int size, bool ctime);
+        Message(float *data, int size, bool ctime, int temperature);
 
         const char* get_message();
         std::string get_string();
         int         get_length();
         
+        // This overload is mostly for convenience
+        friend std::ostream& operator<<(std::ostream& os, const Message& m);
+
     private:
         json j;
         int length;
