@@ -88,7 +88,10 @@ int main()
         // Pa_ReadStream is a blocking call to take in mic input
         err = Pa_ReadStream(stream, data, FFT_SIZE);
 
-        apply_window(window, data, RESULT);
+        // Something is wrong with the window function at the moment.
+        // Gonna have to come back to it later.
+        // Probably not really needed honestly
+        // apply_window(window, data, RESULT);
         fftwf_execute(plan);
 
         // Function computes the magnitude of each

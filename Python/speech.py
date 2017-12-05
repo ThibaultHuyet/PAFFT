@@ -19,15 +19,17 @@ def on_message(client, userdata, msg):
     """
     j = json.loads(msg.payload)
 
+    # Determine bin frequency sizes
     binnum = len(j['mag'])
-    maxj = max(j['mag'])
-
     reso = samplefreq / binnum
-    
     x_temp = np.arange(0, binnum / 2)
     x = [x * reso for x in x_temp]
 
+    # normalize the results
+    maxj = max(j['mag'])
     normj = [x / maxj for x in j['mag']]
+    
+    # plot the results
     plt.plot(x, normj[:2048])
     plt.xscale('log')
     plt.show()
