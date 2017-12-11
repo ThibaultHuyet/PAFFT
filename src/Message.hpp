@@ -12,9 +12,9 @@ using json = nlohmann::json;
 class Message
 {
     public:
-        Message(float *data, int size);
-        Message(float *data, int size, bool ctime);
-        Message(float *data, int size, bool ctime, int temperature);
+        Message(std::string loc, float *data, int size);
+        Message(std::string loc, float *data, int size, bool ctime);
+        Message(std::string loc, float *data, int size, bool ctime, int temperature);
 
         const char* get_message();
         std::string get_string();

@@ -90,7 +90,7 @@ int main()
         mag(out, message, RESULT);
 
         // Here, I prepare the message that will be sent over MQTT
-        Message m(message, RESULT, true);
+        Message m(MQTT_TOPIC, message, RESULT, true);
         auto payload = m.get_message();
         int msgLen = m.get_length();
 

@@ -1,7 +1,8 @@
 #include "Message.hpp"
 
-Message::Message(float *data, int size)
+Message::Message(std::string loc, float *data, int size)
 {   
+    j["loc"] = loc;
     j["mag"] = {};
     for (auto i = 0; i < size; i++)
     {
@@ -12,8 +13,9 @@ Message::Message(float *data, int size)
     length = msg.length();
 }
 
-Message::Message(float *data, int size, bool ctime)
+Message::Message(std::string loc, float *data, int size, bool ctime)
 {
+    j["loc"] = loc;
     j["mag"] = {};
     for (auto i = 0; i < size; i++)
     {
@@ -30,8 +32,9 @@ Message::Message(float *data, int size, bool ctime)
     length = msg.length();
 }
 
-Message::Message(float *data, int size, bool ctime, int temperature)
+Message::Message(std::string loc, float *data, int size, bool ctime, int temperature)
 {
+    j["loc"] = loc;
     j["mag"] = {};
     for (auto i = 0; i < size; i++)
     {
