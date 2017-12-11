@@ -17,7 +17,7 @@ def on_message(client, userdata, msg):
     j = json.loads(msg.payload)
     updated_json = {
                     'time' : j['time'],
-                    'mag' : [x for x in j['mag'] if x != 0],
+                    'mag' : j['mag'][:2048],
                     'loc' : j['loc']
                     }
     result = collection.insert_one(updated_json).inserted_id
