@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import paho.mqtt.client as mqtt
 
-
 samplefreq = 44100
 
 def on_connect(client, userdata, flags, rc):
@@ -18,7 +17,6 @@ def on_message(client, userdata, msg):
     I want this to push this to a database
     """
     j = json.loads(msg.payload)
-
     # Determine bin frequency sizes
     binnum = len(j['mag'])
     reso = samplefreq / binnum
@@ -33,6 +31,8 @@ def on_message(client, userdata, msg):
     plt.plot(x, normj[:2048])
     plt.xscale('log')
     plt.show()
+    
+
 
 client = mqtt.Client()
 client.on_connect = on_connect
