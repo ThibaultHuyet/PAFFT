@@ -1,5 +1,5 @@
 FROM resin/rpi-raspbian:jessie
-MAINTAINER thibault
+MAINTAINER thibault.huyet@gmail.com
 
 RUN apt-get update && apt-get install -y \
     build-essential \
