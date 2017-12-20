@@ -46,3 +46,9 @@ Graphs made on 28th September
 <div>
     <a href="https://plot.ly/~ThibaultHuyet/84/?share_key=Xw7A2sYUfgHJas8emwSOOy" target="_blank" title="plot from API (32)" style="display: block; text-align: center;"><img src="https://plot.ly/~ThibaultHuyet/84.png?share_key=Xw7A2sYUfgHJas8emwSOOy" alt="plot from API (32)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
 </div>
+
+
+# Temp stuff Edit later
+https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/raspberry-pi-wiring-and-test#
+
+https://github.com/PaulCreaser/rpi-i2s-audio
