@@ -20,10 +20,12 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 
 
 ## To Do
-1. I need to choose either c or c++ and stick to the style. The code right now is a cross between the two and quite ugly.
-2. Better graphing.
-3. Maybe store this in a MongoDB database
-4. Run Python side on AWS
+1. Improve graphs
+2. Add synchronization
+3. Commit changes that allow for sending to AWS
+4. Graph data of multiple devices running synchronously
+2. Get data
+3. Perform tests
 
 ## Bugs
 1. There seems to be an issue with Jackd server just not starting after a while of using Docker or program. To fix, you can just use the command jackd -d dummy. jackd -d alsa has bugs for some reason.
