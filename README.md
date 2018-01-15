@@ -11,6 +11,10 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 1. [Plotly](https://plot.ly/)
 2. [MQTT](http://www.eclipse.org/paho/)
 
+## Circuit Diagram
+![Image provided by Adafruit](https://cdn-learn.adafruit.com/assets/assets/000/039/636/original/sensors_pi_i2s_bb.png?1487800378)
+
+
 ## To Do
 1. I need to choose either c or c++ and stick to the style. The code right now is a cross between the two and quite ugly.
 2. Better graphing.
