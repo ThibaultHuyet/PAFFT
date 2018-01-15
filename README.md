@@ -14,6 +14,10 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 ## Circuit Diagram
 ![Image provided by Adafruit](https://cdn-learn.adafruit.com/assets/assets/000/039/636/original/sensors_pi_i2s_bb.png?1487800378)
 
+[Taken from Adafruit](https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/raspberry-pi-wiring-and-test#)
+
+[Drivers from here](https://github.com/PaulCreaser/rpi-i2s-audio)
+
 
 ## To Do
 1. I need to choose either c or c++ and stick to the style. The code right now is a cross between the two and quite ugly.
@@ -50,9 +54,3 @@ Graphs made on 28th September
 <div>
     <a href="https://plot.ly/~ThibaultHuyet/84/?share_key=Xw7A2sYUfgHJas8emwSOOy" target="_blank" title="plot from API (32)" style="display: block; text-align: center;"><img src="https://plot.ly/~ThibaultHuyet/84.png?share_key=Xw7A2sYUfgHJas8emwSOOy" alt="plot from API (32)" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
 </div>
-
-
-# Temp stuff Edit later
-https://learn.adafruit.com/adafruit-i2s-mems-microphone-breakout/raspberry-pi-wiring-and-test#
-
-https://github.com/PaulCreaser/rpi-i2s-audio
