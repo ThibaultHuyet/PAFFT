@@ -1,5 +1,5 @@
 # PAFFT
-This program takes in Audio from PortAudio and then applies a FFT to the audio input. The audio input will then be sent via MQTT to be stored in a database (?) and graphed.
+This program takes in Audio from PortAudio and then applies a FFT to the audio input. The audio input will then be sent via MQTT to be stored in a database and graphed.
 
 ## Libraries Used
 ### c/c++ Libraries
