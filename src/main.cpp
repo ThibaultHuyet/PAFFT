@@ -121,15 +121,13 @@ int main()
 
         // Here, I prepare the message that will be sent over MQTT
         Message m(MQTT_TOPIC, message, RESULT, true);
-        auto payload = m.get_message();
-        int msgLen = m.get_length();
 
         ret = mosquitto_publish(
                                 mosq,               // Initialized with mosquitto_lib_init
                                 nullptr,            // int *mid
                                 MQTT_TOPIC,         // Topic to publish to
-                                msgLen,             // int payload length
-                                payload,            // Message being sent
+                                m.get_length(),             // int payload length
+                                m.get_message(),            // Message being sent
                                 0,                  // Quality of Service
                                 false               // Retain message
                                 );  
