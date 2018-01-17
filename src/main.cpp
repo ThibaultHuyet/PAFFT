@@ -126,8 +126,8 @@ int main()
                                 mosq,               // Initialized with mosquitto_lib_init
                                 nullptr,            // int *mid
                                 MQTT_TOPIC,         // Topic to publish to
-                                m.get_length(),             // int payload length
-                                m.get_message(),            // Message being sent
+                                m.get_length(),     // int payload length
+                                m.get_message(),    // Message being sent
                                 0,                  // Quality of Service
                                 false               // Retain message
                                 );  
