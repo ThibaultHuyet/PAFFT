@@ -16,6 +16,20 @@
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 
+
+/*
+The following files are used if AWS IoT
+is the broker being connected to.
+Be sure to download the capath.
+Keyfile is the private key.
+Sometimes AWS IoT doesn connect instantly and takes a
+while for it fully connect.
+*/
+
+#define cafile "insert "
+#define cert ""
+#define key ""
+
 int main()
 {
     // Initialize the mosquitto that will be used
@@ -28,9 +42,24 @@ int main()
         exit(-1);
     }
 
-    int ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 0);
+    int ret = mosquitto_set_tls(
+                            mosq,
+                            cafile,
+                            nullptr,
+                            cert,
+                            key,
+                            nullptr
+                            );
     if (ret)
     {
+        std::cout << "Could not authenticate\n";
+        exit(-1);
+    }
+
+    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 0);
+    if (ret)
+    {
+        std::cout << "Could not connect to server\n";
         exit(-1);
     }
 
@@ -110,8 +139,12 @@ int main()
         {
             exit(-1);
         }
-
-        Pa_Sleep(5000);
+        auto t = time(nullptr);
+        while (t % 5 != 0)
+        {
+            Pa_Sleep(700);
+            t = time(nullptr);
+        }
     }
 
     err = Pa_Terminate();
