@@ -4,7 +4,7 @@ Message::Message(std::string loc, float *data, int size)
 {   
     j["loc"] = loc;
     j["mag"] = {};
-    for (auto i = 0; i < size; i++)
+    for (auto i = 0; i < size / 2; i++)
     {
         j["mag"].push_back(data[i]);
     }
@@ -17,7 +17,7 @@ Message::Message(std::string loc, float *data, int size, bool ctime)
 {
     j["loc"] = loc;
     j["mag"] = {};
-    for (auto i = 0; i < size; i++)
+    for (auto i = 0; i < size / 2; i++)
     {
         j["mag"].push_back(data[i]);
     }
@@ -36,7 +36,7 @@ Message::Message(std::string loc, float *data, int size, bool ctime, int tempera
 {
     j["loc"] = loc;
     j["mag"] = {};
-    for (auto i = 0; i < size; i++)
+    for (auto i = 0; i < size / 2; i++)
     {
         j["mag"].push_back(data[i]);
     }
