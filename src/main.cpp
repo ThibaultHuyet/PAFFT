@@ -26,9 +26,9 @@ Sometimes AWS IoT doesn connect instantly and takes a
 while for it fully connect.
 */
 
-#define cafile "insert "
-#define cert ""
-#define key ""
+#define cafile "insert cafile path"
+#define cert "insert cert path"
+#define key "insert keyfile path"
 
 int main()
 {
@@ -42,14 +42,16 @@ int main()
         exit(-1);
     }
 
-    int ret = mosquitto_set_tls(
-                            mosq,
-                            cafile,
-                            nullptr,
-                            cert,
-                            key,
-                            nullptr
-                            );
+    int ret = 0;
+
+    // ret = mosquitto_set_tls(
+    //                         mosq,
+    //                         cafile,
+    //                         nullptr,
+    //                         cert,
+    //                         key,
+    //                         nullptr
+    //                         );
     if (ret)
     {
         std::cout << "Could not authenticate\n";
@@ -101,7 +103,6 @@ int main()
     err = Pa_StartStream(stream);
     if (err != paNoError) goto error;
 
-    
     while (true)
     {
         time_t result;          // For sending time data was taken
@@ -139,12 +140,7 @@ int main()
         {
             exit(-1);
         }
-        auto t = time(nullptr);
-        while (t % 5 != 0)
-        {
-            Pa_Sleep(700);
-            t = time(nullptr);
-        }
+        Pa_Sleep(5000);
     }
 
     err = Pa_Terminate();
@@ -161,9 +157,9 @@ int main()
             Pa_AbortStream( stream );
             Pa_CloseStream( stream );
         }
-    mosquitto_disconnect (mosq);
-    mosquitto_destroy (mosq);
-    mosquitto_lib_cleanup();
+        mosquitto_disconnect (mosq);
+        mosquitto_destroy (mosq);
+        mosquitto_lib_cleanup();
 
     return 0;
 }
