@@ -42,7 +42,7 @@ int main()
 
     int ret = 0;
 
-    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 60);
+    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 10);
     if (ret)
     {
         std::cout << "Could not connect to server\n";
@@ -137,6 +137,7 @@ int main()
 
             // Here, I prepare the message that will be sent over MQTT
             Message m(MQTT_TOPIC, message, RESULT, t);
+            
             ret = mosquitto_publish(
                                     mosq,               // Initialized with mosquitto_lib_init
                                     nullptr,            // int *mid
@@ -159,12 +160,12 @@ int main()
             {
                 std::cout << mosquitto_strerror(ret);
             }
-            Pa_Sleep(1000);
+            Pa_Sleep(3000);
         }
 
         else
         {
-            Pa_Sleep(1000);
+            Pa_Sleep(500);
         }
     }
 
