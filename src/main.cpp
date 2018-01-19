@@ -122,6 +122,7 @@ int main()
         int t = time(nullptr);
         if (t - pt > 5 && t % 5 == 0)
         {    
+            pt = t;
             // Create the fftw plan
             fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
             
@@ -155,11 +156,15 @@ int main()
             
             // If mqtt doesn manage a succesful publish
             // There is an error and program should end
-            if (ret)
+            else if (ret)
             {
-                exit(-1);
+                std::cout << mosquitto_strerror(ret);
             }
-            Pa_Sleep(5000);
+        }
+
+        else
+        {
+            Pa_Sleep(1000);
         }
     }
 
