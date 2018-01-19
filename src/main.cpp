@@ -146,7 +146,13 @@ int main()
                                     0,                  // Quality of Service
                                     false               // Retain message
                                     );  
-
+            
+            if (ret == 14)
+            {
+                std::cout << "Reconnecting...\n";
+                ret = mosquitto_reconnect(mosq);
+            }
+            
             // If mqtt doesn manage a succesful publish
             // There is an error and program should end
             if (ret)
