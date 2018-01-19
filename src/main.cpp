@@ -13,25 +13,23 @@
 #define RESULT (FFT_SIZE/2)
 
 #define MQTT_TOPIC "sound"
-#define MQTT_HOSTNAME "localhost"
-#define MQTT_PORT 1883
-
-
-/*
-The following files are used if AWS IoT
-is the broker being connected to.
-Be sure to download the capath.
-Keyfile is the private key.
-Sometimes AWS IoT doesn connect instantly and takes a
-while for it fully connect.
-*/
-
-#define cafile "insert cafile path"
-#define cert "insert cert path"
-#define key "insert keyfile path"
+#define MQTT_HOSTNAME "a3va7bb54859zr.iot.eu-west-1.amazonaws.com"
+#define MQTT_PORT 8883
 
 int main()
 {
+    /*
+    The following files are used if AWS IoT
+    is the broker being connected to.
+    Be sure to download the capath.
+    Keyfile is the private key.
+    Sometimes AWS IoT doesn connect instantly and takes a
+    while for it fully connect.
+    */
+    std::string cafile = "tls/rootCA.pem";
+    std::string cert = "tls/bc158e9240-certificate.pem.crt";
+    std::string key = "tls/bc158e9240-private.pem.key";
+
     // Initialize the mosquitto that will be used
     struct mosquitto *mosq = nullptr;
     mosquitto_lib_init();
@@ -44,26 +42,28 @@ int main()
 
     int ret = 0;
 
-    // ret = mosquitto_set_tls(
-    //                         mosq,
-    //                         cafile,
-    //                         nullptr,
-    //                         cert,
-    //                         key,
-    //                         nullptr
-    //                         );
-    if (ret)
-    {
-        std::cout << "Could not authenticate\n";
-        exit(-1);
-    }
-
-    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 0);
+    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 60);
     if (ret)
     {
         std::cout << "Could not connect to server\n";
         exit(-1);
     }
+
+    ret = mosquitto_tls_set(mosq,
+                            cafile.data(),
+                            nullptr,
+                            cert.data(),
+                            key.data(),
+                            nullptr
+                            );
+
+    if (ret)
+    {
+        std::cout << mosquitto_strerror(ret) << std::endl;
+        std::cout << "Could not authenticate\n";
+        exit(-1);
+    }
+
 
     PaStreamParameters inputParameters;                 // Input parameters for working with PortAudio
     PaError err = 0;                                    // err is for error checking
@@ -78,7 +78,11 @@ int main()
 
     // Initialize PortAudio
     err = Pa_Initialize();
-    if (err != paNoError) goto error;
+    if (err != paNoError)
+    {
+        std::cout << "Problem initializing PortAudio\n";
+        exit(-1);
+    }
 
     // Define the kind of input devcie that we will be using for taking in audio
     inputParameters.device = Pa_GetDefaultInputDevice();
@@ -98,47 +102,59 @@ int main()
                         NULL                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                         );
 
-    if (err != paNoError) goto error;
+    if (err != paNoError)
+    {
+        std::cout << "Problem opening PortAudio stream\n";
+        exit(-1);
+    }
 
     err = Pa_StartStream(stream);
-    if (err != paNoError) goto error;
+    if (err != paNoError)
+    {
+        std::cout << "Problem starting PortAudio stream\n";
+        exit(-1);
+    }
+    
+    int pt = 0;
 
     while (true)
     {
-        time_t result;          // For sending time data was taken
+        int t = time(nullptr);
+        if (t - pt > 5 && t % 5 == 0)
+        {    
+            // Create the fftw plan
+            fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
+            
+            // Pa_ReadStream is a blocking call to take in mic input
+            err = Pa_ReadStream(stream, data, FFT_SIZE);
 
-        // Create the fftw plan
-        fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
-        
-        // Pa_ReadStream is a blocking call to take in mic input
-        err = Pa_ReadStream(stream, data, FFT_SIZE);
+            fftwf_execute(plan);
 
-        fftwf_execute(plan);
+            // Function computes the magnitude of each
+            // complex number and creates a new array
+            mag(out, message, RESULT);
 
-        // Function computes the magnitude of each
-        // complex number and creates a new array
-        mag(out, message, RESULT);
+            // Here, I prepare the message that will be sent over MQTT
+            Message m(MQTT_TOPIC, message, RESULT, t);
 
-        // Here, I prepare the message that will be sent over MQTT
-        Message m(MQTT_TOPIC, message, RESULT, true);
+            ret = mosquitto_publish(
+                                    mosq,               // Initialized with mosquitto_lib_init
+                                    nullptr,            // int *mid
+                                    MQTT_TOPIC,         // Topic to publish to
+                                    m.get_length(),     // int payload length
+                                    m.get_message(),    // Message being sent
+                                    0,                  // Quality of Service
+                                    false               // Retain message
+                                    );  
 
-        ret = mosquitto_publish(
-                                mosq,               // Initialized with mosquitto_lib_init
-                                nullptr,            // int *mid
-                                MQTT_TOPIC,         // Topic to publish to
-                                m.get_length(),     // int payload length
-                                m.get_message(),    // Message being sent
-                                0,                  // Quality of Service
-                                false               // Retain message
-                                );  
-
-        // If mqtt doesn manage a succesful publish
-        // There is an error and program should end
-        if (ret)
-        {
-            exit(-1);
+            // If mqtt doesn manage a succesful publish
+            // There is an error and program should end
+            if (ret)
+            {
+                exit(-1);
+            }
+            Pa_Sleep(5000);
         }
-        Pa_Sleep(5000);
     }
 
     err = Pa_Terminate();
@@ -148,16 +164,6 @@ int main()
     mosquitto_disconnect (mosq);
     mosquitto_destroy (mosq);
     mosquitto_lib_cleanup();
-    
-    error:
-        if( stream )
-        {
-            Pa_AbortStream( stream );
-            Pa_CloseStream( stream );
-        }
-        mosquitto_disconnect (mosq);
-        mosquitto_destroy (mosq);
-        mosquitto_lib_cleanup();
 
     return 0;
 }
