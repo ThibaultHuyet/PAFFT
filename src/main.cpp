@@ -120,7 +120,7 @@ int main()
     while (true)
     {
         int t = time(nullptr);
-        if (t - pt > 5 && t % 5 == 0)
+        if (t - pt > 4 && t % 5 == 0)
         {    
             pt = t;
             // Create the fftw plan
@@ -137,14 +137,13 @@ int main()
 
             // Here, I prepare the message that will be sent over MQTT
             Message m(MQTT_TOPIC, message, RESULT, t);
-
             ret = mosquitto_publish(
                                     mosq,               // Initialized with mosquitto_lib_init
                                     nullptr,            // int *mid
                                     MQTT_TOPIC,         // Topic to publish to
                                     m.get_length(),     // int payload length
                                     m.get_message(),    // Message being sent
-                                    0,                  // Quality of Service
+                                    1,                  // Quality of Service
                                     false               // Retain message
                                     );  
             
