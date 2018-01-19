@@ -159,6 +159,7 @@ int main()
             {
                 std::cout << mosquitto_strerror(ret);
             }
+            Pa_Sleep(1000);
         }
 
         else
