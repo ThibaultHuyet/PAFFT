@@ -1,5 +1,3 @@
-#pragma once
-
 #include "json.hpp"
 
 #include <ctime>
@@ -13,8 +11,8 @@ class Message
 {
     public:
         Message(std::string loc, float *data, int size);
-        Message(std::string loc, float *data, int size, bool ctime);
-        Message(std::string loc, float *data, int size, bool ctime, int temperature);
+        Message(std::string loc, float *data, int size, int ctime);
+        Message(std::string loc, float *data, int size, int ctime, int temperature);
 
         const char* get_message();
         std::string get_string();

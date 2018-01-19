@@ -13,7 +13,7 @@ Message::Message(std::string loc, float *data, int size)
     length = msg.length();
 }
 
-Message::Message(std::string loc, float *data, int size, bool ctime)
+Message::Message(std::string loc, float *data, int size, int ctime)
 {
     j["loc"] = loc;
     j["mag"] = {};
@@ -22,17 +22,13 @@ Message::Message(std::string loc, float *data, int size, bool ctime)
         j["mag"].push_back(data[i]);
     }
 
-    if (ctime)
-    {
-        auto t = time(nullptr);
-        j["time"] = t;
-    }
+    j["time"] = ctime;
 
     msg = j.dump();
     length = msg.length();
 }
 
-Message::Message(std::string loc, float *data, int size, bool ctime, int temperature)
+Message::Message(std::string loc, float *data, int size, int ctime, int temperature)
 {
     j["loc"] = loc;
     j["mag"] = {};
@@ -41,11 +37,7 @@ Message::Message(std::string loc, float *data, int size, bool ctime, int tempera
         j["mag"].push_back(data[i]);
     }
 
-    if (ctime)
-    {
-        auto t = time(nullptr);
-        j["time"] = t;
-    }
+    j["time"] = ctime;
 
     j["temp"] = temperature;
 
