@@ -45,9 +45,9 @@ Message::Message(std::string loc, float *data, int size, int ctime, int temperat
     length = msg.length();
 }
 
-const char* Message::get_message()
+char* Message::get_message()
 {
-    return msg.data();
+    return const_cast<char*>(msg.data());
 }
 
 std::string Message::get_string()

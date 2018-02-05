@@ -14,7 +14,7 @@ class Message
         Message(std::string loc, float *data, int size, int ctime);
         Message(std::string loc, float *data, int size, int ctime, int temperature);
 
-        const char* get_message();
+        char* get_message();
         std::string get_string();
         int         get_length();
         

@@ -1,6 +1,6 @@
 #include <fftw3.h>                      // For performing fft
 #include <portaudio.h>                  // For audio sampling
-#include <mosquitto.h>                  // For sending data
+#include "MQTTClient.h"                  // For sending data
 #include <string>                       // Making a message to be sent
 #include <ctime>
 #include <iostream>
@@ -12,10 +12,12 @@
 #define FFT_SIZE (8192)
 #define RESULT (FFT_SIZE/2)
 
+#define QOS 0
 #define MQTT_TOPIC "sound"
-#define MQTT_HOSTNAME "a3va7bb54859zr.iot.eu-west-1.amazonaws.com"
-#define MQTT_PORT 8883
-
+#define MQTT_HOSTNAME "ec2-54-229-155-118.eu-west-1.compute.amazonaws.com"
+#define MQTT_PORT 1883
+#define CLIENTID "Thibault"
+#define TIMEOUT 2000L
 int main()
 {
     /*
@@ -30,40 +32,28 @@ int main()
     std::string cert = "tls/bc158e9240-certificate.pem.crt";
     std::string key = "tls/bc158e9240-private.pem.key";
 
-    // Initialize the mosquitto that will be used
-    struct mosquitto *mosq = nullptr;
-    mosquitto_lib_init();
+    // Initialize the mosquitto client that will be used
+    MQTTClient client;
+    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+    MQTTClient_message pubmsg = MQTTClient_message_initializer;
+    MQTTClient_deliveryToken token;
+    
+    int rc;
 
-    mosq = mosquitto_new(nullptr, true, nullptr);
-    if (!mosq)
+    MQTTClient_create(&client,
+                    MQTT_HOSTNAME,
+                    CLIENTID,
+                    MQTTCLIENT_PERSISTENCE_NONE,
+                    NULL);
+
+    conn_opts.keepAliveInterval = 20;
+    conn_opts.cleansession = 1;
+
+    if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
     {
-        exit(-1);
+        printf("Failed to connect, return code %d\n", rc);
+        exit(EXIT_FAILURE);
     }
-
-    int ret = 0;
-
-    ret = mosquitto_connect(mosq, MQTT_HOSTNAME, MQTT_PORT, 10);
-    if (ret)
-    {
-        std::cout << "Could not connect to server\n";
-        exit(-1);
-    }
-
-    ret = mosquitto_tls_set(mosq,
-                            cafile.data(),
-                            nullptr,
-                            cert.data(),
-                            key.data(),
-                            nullptr
-                            );
-
-    if (ret)
-    {
-        std::cout << mosquitto_strerror(ret) << std::endl;
-        std::cout << "Could not authenticate\n";
-        exit(-1);
-    }
-
 
     PaStreamParameters inputParameters;                 // Input parameters for working with PortAudio
     PaError err = 0;                                    // err is for error checking
@@ -138,34 +128,19 @@ int main()
             // Here, I prepare the message that will be sent over MQTT
             Message m(MQTT_TOPIC, message, RESULT, t);
             
-            ret = mosquitto_publish(
-                                    mosq,               // Initialized with mosquitto_lib_init
-                                    nullptr,            // int *mid
-                                    MQTT_TOPIC,         // Topic to publish to
-                                    m.get_length(),     // int payload length
-                                    m.get_message(),    // Message being sent
-                                    1,                  // Quality of Service
-                                    false               // Retain message
-                                    );  
-            
-            if (ret == 14)
-            {
-                std::cout << "Reconnecting...\n";
-                ret = mosquitto_reconnect(mosq);
-            }
-            
-            // If mqtt doesn manage a succesful publish
-            // There is an error and program should end
-            else if (ret)
-            {
-                std::cout << mosquitto_strerror(ret);
-            }
+            pubmsg.payload = m.get_message();
+            pubmsg.payloadlen = m.get_length();
+            pubmsg.qos = QOS;
+            pubmsg.retained = 0;
+            MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
+            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+
             Pa_Sleep(3000);
         }
 
         else
         {
-            Pa_Sleep(500);
+            Pa_Sleep(1000);
         }
     }
 
@@ -173,9 +148,8 @@ int main()
     if (err != paNoError)
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 
-    mosquitto_disconnect (mosq);
-    mosquitto_destroy (mosq);
-    mosquitto_lib_cleanup();
+    MQTTClient_disconnect(client, 10000);
+    MQTTClient_destroy(&client);
 
     return 0;
 }
