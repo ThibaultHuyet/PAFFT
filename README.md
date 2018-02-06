@@ -3,6 +3,7 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 
 ## Build && run Docker
 docker build -t sound_sensor .
+
 docker run --privileged -dp 1883 sound_sensor
 
 ## Libraries Used
