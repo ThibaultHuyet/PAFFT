@@ -22,3 +22,4 @@ store.py is intended to store the audio data received into a database.
 
 ### To Do
 * Consider whether it is possible to indicate when a failure has happened/reset RPi
+* Add Images received from tests to this README
