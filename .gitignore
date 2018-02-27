@@ -1,5 +1,5 @@
 main
 .vscode/
 *.pem
-
+*.tar.gz
 tls
