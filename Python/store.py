@@ -3,6 +3,8 @@ import paho.mqtt.client as mqtt
 import pymongo
 from pymongo import MongoClient
 
+print('storing module started')
+
 client = MongoClient()
 db = client.Audio
 collection = db.fft
@@ -12,14 +14,13 @@ def on_connect(client, userdata, flags, rc):
     Subscribes to sound topic
     """
     client.subscribe('sound')
+    print('connected to sound')
 
 def on_message(client, userdata, msg):
     j = json.loads(msg.payload)
     updated_json = {
                     'time' : j['time'],
-    # the array is 4096 big. First half is useful, second half is -ve frequencies
-    # That is why I cut the mag value in half
-                    'mag' : j['mag'][:2048],
+                    'complex' : j['complex'],
                     'loc' : j['loc']
                     }
 
