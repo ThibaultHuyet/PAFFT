@@ -5,6 +5,7 @@ import dash_html_components as html
 
 import numpy as np
 from pymongo import MongoClient
+import plotly.graph_objs as go
 
 client = MongoClient()
 db = client.Audio
@@ -25,8 +26,6 @@ spectrum = np.array(slices)
 S = np.absolute(spectrum)
 S = 20 * np.log10(S / np.max(S))
 
-
-
 app = dash.Dash()
 
 app.layout = html.Div(children=[
@@ -36,20 +35,29 @@ app.layout = html.Div(children=[
     '''),
    dcc.Graph(
         id='example-graph',
-        figure={
-            'data': [
-                {'x': time,
-                'y': frequencies,
-                'z' : S.T,
-                'type': 'heatmap',
-                'name': 'SF'},
-            ],
-            'layout': {
-                'title': 'Dash Data Visualization'
-            }
-        }
+        figure = go.Figure(
+            data = [go.Heatmap(
+                x = time, y = frequencies, z = S.T,
+                colorscale = 'Viridis',
+                )],
+            layout = {'xaxis' : dict(title = 'Time (s)'),
+                    'yaxis' : dict(title = 'Frequencies (kHz)')}
+        )
+        # figure={
+        #     'data': [
+        #         {'x': time,
+        #         'y': frequencies,
+        #         'z' : S.T,
+        #         'type': 'heatmap',
+        #         'xaxis' : 'Time (s)',
+        #         'yaxis' : 'Frequencies (kHz)'},
+        #     ],
+        #     'layout': {
+        #         'title': 'Dash Data Visualization'
+        #     }
+        # }
     )
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host = '0.0.0.0', debug=True)
