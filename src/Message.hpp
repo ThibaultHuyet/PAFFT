@@ -17,7 +17,7 @@ class Message
         
         // This constructor is for testing purposes. It is used for sending unchanged fourier data
         // This data will then be used to reconstruct the original signal
-        Message(std::string loc, fftw_complex *out, int size, int ctime);
+        Message(std::string loc, fftwf_complex *out, int size, int ctime);
         char* get_message();
         std::string get_string();
         int         get_length();

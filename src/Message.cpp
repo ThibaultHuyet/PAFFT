@@ -48,14 +48,14 @@ Message::Message(std::string loc, float *data, int size, int ctime, int temperat
 Message::Message(std::string loc, fftwf_complex *out, int size, int ctime)
 {
     j["loc"] = loc;
-    j["complex]["real"] = {};
-    j["complex]["imag"] = {};
+    j["complex"]["real"] = {};
+    j["complex"]["imag"] = {};
       
     for (auto i = 0; i < size / 2; i++)
     {
         // 0 is real, 1 is imaginary in fftw's API
         j["complex"]["real"].push_back(out[i][0]);
-        j["complex"]["real"].push_back(out[i][]1);
+        j["complex"]["imag"].push_back(out[i][1]);
     }
       
     j["time"] = ctime;
