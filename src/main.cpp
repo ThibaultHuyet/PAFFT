@@ -14,7 +14,7 @@
 
 #define QOS 0
 #define MQTT_TOPIC "sound"
-#define MQTT_HOSTNAME "ec2-54-229-155-118.eu-west-1.compute.amazonaws.com"
+#define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 #define CLIENTID "Thibault"
 #define TIMEOUT 2000L
@@ -123,10 +123,10 @@ int main()
 
             // Function computes the magnitude of each
             // complex number and creates a new array
-            mag(out, message, RESULT);
+            // mag(out, message, RESULT);
 
             // Here, I prepare the message that will be sent over MQTT
-            Message m(MQTT_TOPIC, message, RESULT, t);
+            Message m(MQTT_TOPIC, out, RESULT, t);
             
             pubmsg.payload = m.get_message();
             pubmsg.payloadlen = m.get_length();
