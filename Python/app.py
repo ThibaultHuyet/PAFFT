@@ -13,9 +13,7 @@ collection = db.fft
 results = collection.find().limit(100).sort('time', -1)
 
 time = np.arange(-500, 0, 5)
-print(len(time))
-frequencies = np.arange(0, 22050, 5.4)
-print(len(frequencies))
+frequencies = np.arange(0, 22050, 5.38330078)
 
 slices = []
 for result in results:
@@ -26,35 +24,32 @@ for result in results:
 spectrum = np.array(slices)
 S = np.absolute(spectrum)
 S = 20 * np.log10(S / np.max(S))
-print(S.shape)
 
 
 
-# app = dash.Dash()
+app = dash.Dash()
 
-# app.layout = html.Div(children=[
-#     html.H1(children='Hello Dash'),
+app.layout = html.Div(children=[
+   html.H1(children='Hello Dash'),
+   html.Div(children='''
+        Dash: A web application framework for Python.
+    '''),
+   dcc.Graph(
+        id='example-graph',
+        figure={
+            'data': [
+                {'x': time,
+                'y': frequencies,
+                'z' : S.T,
+                'type': 'heatmap',
+                'name': 'SF'},
+            ],
+            'layout': {
+                'title': 'Dash Data Visualization'
+            }
+        }
+    )
+])
 
-#     html.Div(children='''
-#         Dash: A web application framework for Python.
-#     '''),
-
-#     dcc.Graph(
-#         id='example-graph',
-#         figure={
-#             'data': [
-#                 {'x': time,
-#                 'y': [4, 1, 2],
-#                 'z' : S,
-#                 'type': 'heatmap',
-#                 'name': 'SF'},
-#             ],
-#             'layout': {
-#                 'title': 'Dash Data Visualization'
-#             }
-#         }
-#     )
-# ])
-
-# if __name__ == '__main__':
-#     app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(debug=True)
