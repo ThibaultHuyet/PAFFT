@@ -29,10 +29,6 @@ S = 20 * np.log10(S / np.max(S))
 app = dash.Dash()
 
 app.layout = html.Div(children=[
-   html.H1(children='Hello Dash'),
-   html.Div(children='''
-        Dash: A web application framework for Python.
-    '''),
    dcc.Graph(
         id='example-graph',
         figure = go.Figure(
@@ -40,22 +36,10 @@ app.layout = html.Div(children=[
                 x = time, y = frequencies, z = S.T,
                 colorscale = 'Viridis',
                 )],
-            layout = {'xaxis' : dict(title = 'Time (s)'),
+            layout = {'title' : 'Spectrogram of Microphone',
+                    'xaxis' : dict(title = 'Time (s)'),
                     'yaxis' : dict(title = 'Frequencies (kHz)')}
         )
-        # figure={
-        #     'data': [
-        #         {'x': time,
-        #         'y': frequencies,
-        #         'z' : S.T,
-        #         'type': 'heatmap',
-        #         'xaxis' : 'Time (s)',
-        #         'yaxis' : 'Frequencies (kHz)'},
-        #     ],
-        #     'layout': {
-        #         'title': 'Dash Data Visualization'
-        #     }
-        # }
     )
 ])
 
