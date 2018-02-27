@@ -63,7 +63,7 @@ int main()
     // data will be the input to fft
     // out will be the output
     float data[FFT_SIZE];
-    fftwf_complex out[FFT_SIZE/2];
+    fftwf_complex out[FFT_SIZE / 2];
     float message[FFT_SIZE/2];
 
     // Initialize PortAudio

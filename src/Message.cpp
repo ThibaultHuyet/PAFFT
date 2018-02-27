@@ -51,7 +51,7 @@ Message::Message(std::string loc, fftwf_complex *out, int size, int ctime)
     j["complex"]["real"] = {};
     j["complex"]["imag"] = {};
       
-    for (auto i = 0; i < size / 2; i++)
+    for (auto i = 0; i < size; i++)
     {
         // 0 is real, 1 is imaginary in fftw's API
         j["complex"]["real"].push_back(out[i][0]);
