@@ -30,7 +30,7 @@ store.py is intended to store the audio data received into a database.
 * [MongoDB](https://www.mongodb.com/) (Might be changed)
 
 ### Graphs
-#### Computer's Microhphone
+#### Computer's microphone
 ![alt text](https://imgur.com/Tmr4ogk.png "5k tone generator")
 
 ![alt text](https://imgur.com/HREHQtK.png "14k tone generator")
@@ -43,3 +43,5 @@ store.py is intended to store the audio data received into a database.
 ![alt text](https://imgur.com/kgMBGSR.png "5k tone generator")
 
 ![alt text](https://imgur.com/eSa1vFE.png "10k tone generator")
+
+![alt text](https://imgur.com/UGzlLT9.png "15k and 5k tone generator")
