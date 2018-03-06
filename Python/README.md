@@ -6,7 +6,7 @@ store.py is intended to store the audio data received into a database.
 
 ## store.py
 ### Libraries
-* [MongoDB](https://www.mongodb.com/) (Subject to change)
+* [MongoDB](https://www.mongodb.com/) (Might be changed)
 * [Paho MQTT](https://www.eclipse.org/paho/clients/python/)
 
 ### To DO
@@ -23,3 +23,23 @@ store.py is intended to store the audio data received into a database.
 ### To Do
 * Consider whether it is possible to indicate when a failure has happened/reset RPi
 * Add Images received from tests to this README
+
+## app.py
+### Libraries
+* [Plotly Dash](https://plot.ly/products/dash/)
+* [MongoDB](https://www.mongodb.com/) (Might be changed)
+
+### Graphs
+#### Computer's Microhphone
+![alt text](https://imgur.com/Tmr4ogk "5k tone generator")
+
+![alt text](https://imgur.com/HREHQtK "14k tone generator")
+
+![alt text](https://imgur.com/TByTIiu "700 tone generator")
+
+#### Raspberry Pi's microphone
+![alt text](https://imgur.com/kgMBGSR "200 and 450 tone generator")
+
+![alt text](https://imgur.com/kgMBGSR "5k tone generator")
+
+![alt text](https://imgur.com/eSa1vFE "10k tone generator")
