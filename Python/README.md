@@ -31,15 +31,15 @@ store.py is intended to store the audio data received into a database.
 
 ### Graphs
 #### Computer's Microhphone
-![alt text](https://imgur.com/Tmr4ogk "5k tone generator")
+![alt text](https://imgur.com/Tmr4ogk.png "5k tone generator")
 
-![alt text](https://imgur.com/HREHQtK "14k tone generator")
+![alt text](https://imgur.com/HREHQtK.png "14k tone generator")
 
-![alt text](https://imgur.com/TByTIiu "700 tone generator")
+![alt text](https://imgur.com/TByTIiu.png "700 tone generator")
 
 #### Raspberry Pi's microphone
-![alt text](https://imgur.com/kgMBGSR "200 and 450 tone generator")
+![alt text](https://imgur.com/kgMBGSR.png "200 and 450 tone generator")
 
-![alt text](https://imgur.com/kgMBGSR "5k tone generator")
+![alt text](https://imgur.com/kgMBGSR.png "5k tone generator")
 
-![alt text](https://imgur.com/eSa1vFE "10k tone generator")
+![alt text](https://imgur.com/eSa1vFE.png "10k tone generator")
