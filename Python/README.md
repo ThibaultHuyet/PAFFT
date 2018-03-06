@@ -40,7 +40,7 @@ store.py is intended to store the audio data received into a database.
 #### Raspberry Pi's microphone
 ![alt text](https://imgur.com/kgMBGSR.png "200 and 450 tone generator")
 
-![alt text](https://imgur.com/kgMBGSR.png "5k tone generator")
+![alt text](https://imgur.com/kgMBGSR.png "200 and 450 tone generator")
 
 ![alt text](https://imgur.com/eSa1vFE.png "10k tone generator")
 
