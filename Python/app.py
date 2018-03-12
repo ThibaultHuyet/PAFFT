@@ -82,7 +82,7 @@ def update_spectrogram(n):
 
     trace = go.Heatmap(x = time, y = frequencies, z = S.T)
     layout = go.Layout(title = 'Spectrogram of Microphone',
-                        xaxis = dict(title = 'Time Passed(s)')
+                        xaxis = dict(title = 'Time Passed(s)'),
                         yaxis = dict(title = 'Frequencies (kHz)'))
 
     return go.Figure(data = [trace], layout = layout)
