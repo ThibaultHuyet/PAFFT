@@ -20,6 +20,11 @@ store.py is intended to store the audio data received into a database.
 * [Matplotlib](https://matplotlib.org/)
 * [Numpy](http://www.numpy.org/)
 
+
+# To format later
+https://imgur.com/a/njkCG
+
+
 ### To Do
 * Consider whether it is possible to indicate when a failure has happened/reset RPi
 * Add Images received from tests to this README
