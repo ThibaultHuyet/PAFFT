@@ -7,30 +7,20 @@
 #include "lib.h"
 #include "Message.hpp"
 
-#define SAMPLE_RATE (44100)
-
-#define FFT_SIZE (8192)
-#define RESULT (FFT_SIZE/2)
-
-#define QOS 0
 #define MQTT_TOPIC "sound"
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 #define CLIENTID "Thibault"
 #define TIMEOUT 2000L
+
 int main()
 {
-    /*
-    The following files are used if AWS IoT
-    is the broker being connected to.
-    Be sure to download the capath.
-    Keyfile is the private key.
-    Sometimes AWS IoT doesn connect instantly and takes a
-    while for it fully connect.
-    */
-    std::string cafile = "tls/rootCA.pem";
-    std::string cert = "tls/bc158e9240-certificate.pem.crt";
-    std::string key = "tls/bc158e9240-private.pem.key";
+    int fft_size = 8392;
+    int sample_rate = 44100;
+    // Applying a fft transform on data halves the amount of data available
+    int fft_result = (fft_size - 200) / 2;
+    int qos = 0;
+
 
     // Initialize the mosquitto client that will be used
     MQTTClient client;
@@ -62,9 +52,11 @@ int main()
     // data is going to be where audio data is stored
     // data will be the input to fft
     // out will be the output
-    float data[FFT_SIZE];
-    fftwf_complex out[FFT_SIZE / 2];
-    float message[FFT_SIZE/2];
+    float data[fft_size];
+    float reduced_data[fft_size - 200];
+    fftwf_complex out[fft_size / 2];
+
+    float message[fft_size/2];
 
     // Initialize PortAudio
     err = Pa_Initialize();
@@ -85,8 +77,8 @@ int main()
     err = Pa_OpenStream(&stream,                // Stream used for input
                         &inputParameters,       // Structure used to describe input parameters used by stream
                         NULL,                   // outputparameters: Since this is input only, this is NULL
-                        SAMPLE_RATE,            // sample rate
-                        FFT_SIZE,               // frames per buffer
+                        sample_rate,            // sample rate
+                        fft_size,               // frames per buffer
                         paClipOff,              // Not bothering to clip samples
                         NULL,                   // Using blocking API for now, so no callback or callback data
                         NULL                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -114,10 +106,11 @@ int main()
         {    
             pt = t;
             // Create the fftw plan
-            fftwf_plan plan = fftwf_plan_dft_r2c_1d(FFT_SIZE, data, out, FFTW_ESTIMATE);        
+            fftwf_plan plan = fftwf_plan_dft_r2c_1d(fft_size, reduced_data, out, FFTW_ESTIMATE);        
             
             // Pa_ReadStream is a blocking call to take in mic input
-            err = Pa_ReadStream(stream, data, FFT_SIZE);
+            err = Pa_ReadStream(stream, data, fft_size);
+            remove_data(data, reduced_data, fft_size);
 
             fftwf_execute(plan);
 
@@ -126,11 +119,11 @@ int main()
             // mag(out, message, RESULT);
 
             // Here, I prepare the message that will be sent over MQTT
-            Message m(MQTT_TOPIC, out, RESULT, t);
+            Message m(MQTT_TOPIC, out, fft_result, t);
             
             pubmsg.payload = m.get_message();
             pubmsg.payloadlen = m.get_length();
-            pubmsg.qos = QOS;
+            pubmsg.qos = qos;
             pubmsg.retained = 0;
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
