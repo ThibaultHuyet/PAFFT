@@ -12,7 +12,7 @@ do
         containerarray=($container)
         programarray=($program)
 
-        mosquitto_pub -h '172.28.14.95' -t 'hello' -m '{"performance" : {"total" :
+        mosquitto_pub -h '172.28.14.95' -t 'performance' -m '{"performance" : {"total" :
 {"cpu" :'"${totalarray[0]}"', "mem" :'"${totalarray[1]}"'}, "dockerd" : {"cpu":
 '"${dockerdarray[1]}"', "mem":'"${dockerdarray[2]}"'}, "container":{"cpu":
 '"${containerarray[1]}"', "mem":'"${containerarray[2]}"'},
