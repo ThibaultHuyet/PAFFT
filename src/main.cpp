@@ -15,10 +15,10 @@
 
 int main()
 {
-    int fft_size = 8392;
+    int fft_size = 8192;
     int sample_rate = 44100;
     // Applying a fft transform on data halves the amount of data available
-    int fft_result = (fft_size - 200) / 2;
+    int fft_result = (fft_size) / 2;
     int qos = 0;
 
 
@@ -53,7 +53,6 @@ int main()
     // data will be the input to fft
     // out will be the output
     float data[fft_size];
-    float reduced_data[fft_size - 200];
     fftwf_complex out[fft_size / 2];
 
     float message[fft_size/2];
@@ -106,12 +105,10 @@ int main()
         {    
             pt = t;
             // Create the fftw plan
-            fftwf_plan plan = fftwf_plan_dft_r2c_1d(fft_size, reduced_data, out, FFTW_ESTIMATE);        
+            fftwf_plan plan = fftwf_plan_dft_r2c_1d(fft_size, data, out, FFTW_ESTIMATE);        
             
             // Pa_ReadStream is a blocking call to take in mic input
             err = Pa_ReadStream(stream, data, fft_size);
-            remove_data(data, reduced_data, fft_size);
-
             fftwf_execute(plan);
 
             // Function computes the magnitude of each
