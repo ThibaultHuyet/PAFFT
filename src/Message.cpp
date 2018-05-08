@@ -59,7 +59,7 @@ Message::Message(std::string loc, fftwf_complex *out, int size, int ctime, int l
     }
       
     j["time"] = ctime;
-      
+    j["latency"] = lat;
     msg = j.dump();
     length = msg.length();
 }
