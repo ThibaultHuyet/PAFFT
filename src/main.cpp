@@ -13,8 +13,6 @@
 #define CLIENTID "Thibault"             // Change this variable for each sensor
 #define TIMEOUT 2000L
 
-#define MQTT_TIME "Nimbus/.../time"     // Change this variable for each sensor
-
 int main()
 {
     int fft_size = 8192;
@@ -99,7 +97,7 @@ int main()
     }
     
     int pt = 0;
-    int lat = 0; // Latency variable
+    float lat = 0; // Latency variable
     while (true)
     {
         int t = time(nullptr);
@@ -121,11 +119,11 @@ int main()
             pubmsg.qos = qos;
             pubmsg.retained = 0;
 
-            int time_before_publish = time(nullptr);
+            int time_before_publish = clock(nullptr);
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-            int time_after_publish = time(nullptr);
-            lat = time_after_publish - time_before_publish;
+            int time_after_publish = clock(nullptr);
+            lat = ((float)(time_after_publish - time_before_publish))/CLOCKS_PER_SEC;
 
             Pa_Sleep(3000);
         }
