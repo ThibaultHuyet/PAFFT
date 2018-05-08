@@ -99,7 +99,7 @@ int main()
     }
     
     int pt = 0;
-
+    int lat = 0; // Latency variable
     while (true)
     {
         int t = time(nullptr);
@@ -118,7 +118,7 @@ int main()
             // mag(out, message, RESULT);
 
             // Here, I prepare the message that will be sent over MQTT
-            Message m(MQTT_TOPIC, out, fft_result, t);
+            Message m(MQTT_TOPIC, out, fft_result, t, lat);
             
             // Refactor section so it isnt so repeated
 
@@ -131,16 +131,7 @@ int main()
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
             int time_after_publish = time(nullptr);
-            int lat = time_after_publish - time_before_publish;
-
-            Message t(MQTT_TIME, lat);
-            pubmsg.payload = t.get_message();
-            pubmsg.payloadlen = m.get_length();
-            pubmsg.qos = qos;
-            pubmsg.retained = 0;
-
-            MQTTClient_publishMessage(client, MQTT_TIME, &pubmsg, &token);
-            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+            lat = time_after_publish - time_before_publish;
 
             Pa_Sleep(3000);
         }
