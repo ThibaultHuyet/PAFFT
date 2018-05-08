@@ -7,11 +7,13 @@
 #include "lib.h"
 #include "Message.hpp"
 
-#define MQTT_TOPIC "sound"
+#define MQTT_TOPIC "Nimbus/..."         // Change this variable for each sensor
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
-#define CLIENTID "Thibault"
+#define CLIENTID "Thibault"             // Change this variable for each sensor
 #define TIMEOUT 2000L
+
+#define MQTT_TIME "Nimbus/.../time"     // Change this variable for each sensor
 
 int main()
 {
@@ -118,11 +120,25 @@ int main()
             // Here, I prepare the message that will be sent over MQTT
             Message m(MQTT_TOPIC, out, fft_result, t);
             
+            // Refactor section so it isnt so repeated
+
             pubmsg.payload = m.get_message();
             pubmsg.payloadlen = m.get_length();
             pubmsg.qos = qos;
             pubmsg.retained = 0;
+
+            int time_before_publish = time(nullptr);
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
+            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+            int time_after_publish = time(nullptr);
+
+            Message t(MQTT_TIME, (time_after_publish - time_before_publish));
+            pubmsg.payload = t.get_message();
+            pubmsg.payloadlen = m.get_length();
+            pubmsg.qos = qos;
+            pubmsg.retained = 0;
+
+            MQTTClient_publishMessage(client, MQTT_TIME, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
 
             Pa_Sleep(3000);

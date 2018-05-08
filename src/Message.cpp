@@ -64,6 +64,15 @@ Message::Message(std::string loc, fftwf_complex *out, int size, int ctime)
     length = msg.length();
 }
 
+Message::Message(std::string loc, int ctime)
+{
+    j["loc"] = loc;
+    j["Latency"] = ctime;
+
+    msg = j.dump();
+    length = msg.length();
+}
+
 char* Message::get_message()
 {
     return const_cast<char*>(msg.data());
