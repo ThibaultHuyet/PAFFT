@@ -45,7 +45,7 @@ Message::Message(std::string loc, float *data, int size, int ctime, int temperat
     length = msg.length();
 }
 
-Message::Message(std::string loc, fftwf_complex *out, int size, int ctime, int lat)
+Message::Message(std::string loc, fftwf_complex *out, int size, int ctime, float lat)
 {
     j["loc"] = loc;
     j["complex"]["real"] = {};

@@ -119,11 +119,12 @@ int main()
             pubmsg.qos = qos;
             pubmsg.retained = 0;
 
-            int time_before_publish = clock(nullptr);
+            clock_t time_before_publish = clock();
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
-            int time_after_publish = clock(nullptr);
-            lat = ((float)(time_after_publish - time_before_publish))/CLOCKS_PER_SEC;
+            clock_t time_after_publish = clock();
+            clock_t diff = time_after_publish - time_before_publish;
+            lat = ((float)diff)/CLOCKS_PER_SEC;
 
             Pa_Sleep(3000);
         }
