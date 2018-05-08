@@ -113,15 +113,9 @@ int main()
             err = Pa_ReadStream(stream, data, fft_size);
             fftwf_execute(plan);
 
-            // Function computes the magnitude of each
-            // complex number and creates a new array
-            // mag(out, message, RESULT);
-
             // Here, I prepare the message that will be sent over MQTT
             Message m(MQTT_TOPIC, out, fft_result, t, lat);
             
-            // Refactor section so it isnt so repeated
-
             pubmsg.payload = m.get_message();
             pubmsg.payloadlen = m.get_length();
             pubmsg.qos = qos;
