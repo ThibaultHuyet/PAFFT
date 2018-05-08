@@ -131,8 +131,9 @@ int main()
             MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
             rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
             int time_after_publish = time(nullptr);
+            int lat = time_after_publish - time_before_publish;
 
-            Message t(MQTT_TIME, (time_after_publish - time_before_publish));
+            Message t(MQTT_TIME, lat);
             pubmsg.payload = t.get_message();
             pubmsg.payloadlen = m.get_length();
             pubmsg.qos = qos;
