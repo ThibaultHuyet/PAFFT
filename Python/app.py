@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -18,7 +17,7 @@ collection = db.fft
 time = np.arange(0, 100, 1)
 frequencies = np.arange(0, 22049, 5.38330078)
 
-results = collection.find().limit(100).sort('time', pymongo.DESCENDING)
+results = collection.find({'loc':'Nimbus/Top/1/Audio'}).limit(100).sort('time', pymongo.DESCENDING)
 
 slices = []
 for result in results:
@@ -38,9 +37,25 @@ app.layout = html.Div([
                 interval = 10 * 1000, # Graph updates every 10 seconds
                 n_intervals = 0),
 
-    dcc.Graph(id = 'fft-series')
+    dcc.Graph(id = 'fft-series'),
+    dcc.Graph(id = 'latency')
 ])
 
+@app.callback(Output('latency', 'figure'),
+[Input('interval-component', 'n-intervals')])
+def update_latency(n):
+
+    results = collection.find({'loc':'Nimbus/Top/1/Audio'},
+    {'_id': False, 'real': False, 'complex': False}).limit(100).sort('time', pymongo.DESCENDING)
+    trace = go.Scatter(x = result['time'],
+                        y = result['latency'],
+                        mode = 'lines')
+
+    layout = go.Layout(title = 'Latency',
+                        xaxis = dict(title = 'Time'),
+                        yaxis = dict(title = 'Latency'))
+
+    return go.Figure(data = [trace], layout = layout)
 
 @app.callback(Output('fft-series', 'figure'),
 [Input('live-spectrograph', 'hoverData')])
@@ -68,7 +83,7 @@ def update_spectrogram(n):
     Function for keeping the spectrograph to updated live
     It makes a call to a MongoDB database.
     '''
-    results = collection.find().limit(100).sort('time', pymongo.DESCENDING)
+    results = collection.find({'loc':'Nimbus/Top/1/Audio'}).limit(100).sort('time', pymongo.DESCENDING)
 
     slices = []
     for result in results:
