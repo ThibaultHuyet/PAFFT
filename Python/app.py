@@ -38,15 +38,19 @@ app.layout = html.Div([
                 n_intervals = 0),
 
     dcc.Graph(id = 'fft-series'),
-    dcc.Graph(id = 'latency')
+    dcc.Graph(id = 'latency'),
+    dcc.Interval(id = 'latency-interval-component',
+                interval = 10*1000,
+                n_intervals = 0)
 ])
 
 @app.callback(Output('latency', 'figure'),
-[Input('interval-component', 'n_intervals')])
+[Input('latency-interval-component', 'n_intervals')])
 def update_latency(n):
 
     results = collection.find({'loc':'Nimbus/Top/1/Audio'},
     {'_id': False, 'real': False, 'complex': False}).limit(100).sort('time', pymongo.DESCENDING)
+    
     trace = go.Scatter(x = result['time'],
                         y = result['latency'],
                         mode = 'lines')
