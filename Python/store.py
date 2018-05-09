@@ -13,7 +13,7 @@ def on_connect(client, userdata, flags, rc):
     """
     Subscribes to sound topic
     """
-    client.subscribe('sound')
+    client.subscribe('Nimbus/+/+/Audio')
     print('connected to sound')
 
 def on_message(client, userdata, msg):
@@ -21,7 +21,8 @@ def on_message(client, userdata, msg):
     updated_json = {
                     'time' : j['time'],
                     'complex' : j['complex'],
-                    'loc' : j['loc']
+                    'loc' : j['loc'],
+                    'latency' : j['latency']
                     }
 
     result = collection.insert_one(updated_json).inserted_id
