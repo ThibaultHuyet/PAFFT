@@ -42,7 +42,7 @@ app.layout = html.Div([
 ])
 
 @app.callback(Output('latency', 'figure'),
-[Input('interval-component', 'n-intervals')])
+[Input('interval-component', 'n_intervals')])
 def update_latency(n):
 
     results = collection.find({'loc':'Nimbus/Top/1/Audio'},
