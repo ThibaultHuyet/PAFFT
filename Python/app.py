@@ -9,11 +9,13 @@ import pymongo
 import plotly.graph_objs as go
 import plotly
 import json
-from bson import json_util
+from bson.json_util import dumps
 
 client = MongoClient()
 db = client.Audio
+
 collection = db.fft
+power = db.power
 
 frequencies = np.arange(0, 22049, 5.38330078)
 
@@ -35,9 +37,34 @@ app.layout = html.Div([
     dcc.Graph(id = 'latency'),
     dcc.Interval(id = 'latency-interval-component',
                 interval = 10*1000,
-                n_intervals = 0)
+                n_intervals = 0),
+    dcc.Graph(id = 'live-power'),
+    dcc.Interval(id = 'power-interval',
+		 interval = 10 * 1000,
+		 n_intervals = 0)
 ])
 
+@app.callback(Output('live-power', 'figure'),
+[Input('power-interval', 'n_intervals')])
+def update_power(n):
+    results = power.find({'loc': 'Nimbus/Top/1'}).limit(100).sort('time', pymongo.DESCENDING)
+
+    time = []
+    total = []
+    for result in results:
+        time.append(result['time'])
+        total.append(result['performance']['total']['cpu'])
+
+    trace = go.Scatter(x = time,
+                       y = total,
+                       mode = 'lines')
+
+    layout = go.Layout(title = 'Power',
+                       xaxis = dict(title = 'Time',
+                                    tickformat = 'f'),
+                       yaxis = dict(title = '%CPU'))
+
+    return go.Figure(data = [trace], layout = layout)
 
 @app.callback(Output('latency', 'figure'),
 [Input('latency-interval-component', 'n_intervals'),
@@ -58,7 +85,8 @@ def update_latency(n, dropdown):
                         mode = 'lines')
 
     layout = go.Layout(title = 'Latency',
-                        xaxis = dict(title = 'Time'),
+                        xaxis = dict(title = 'Time',
+				     tickformat = 'f'),
                         yaxis = dict(title = 'Latency'))
 
     return go.Figure(data = [trace], layout = layout)
@@ -71,14 +99,15 @@ def update_fft_series(hoverData, dropdown):
     This is the function for allowing someone to hover over a data point
     in the spectrograph and it will then update the FFT graph with the hovered data
     '''
-    result = collection.find_one({'time' : hoverData['points'][0]['x'],
+    time = hoverData['points'][0]['x']
+    result = collection.find_one({'time' : time,
                                'loc' : dropdown})
 
-    fft = json.loads(result, default = json_util.default)
-    fft = [(r + i*1j) for r, i in zip(fft['complex']['real'], fft['complex']['imag'])]
+    converted = json.loads(dumps(result))
+    fft_graph = [(r + i * 1j) for r, i in zip(converted['complex']['real'], converted['complex']['imag'])]
     
     trace = go.Scatter(x = frequencies,
-                    y = fft,
+                    y = fft_graph,
                     mode = 'lines')
 
     layout = go.Layout(title = 'FFT of point',
@@ -113,7 +142,8 @@ def update_spectrogram(n, dropdown):
 
     trace = go.Heatmap(x = time, y = frequencies, z = S.T)
     layout = go.Layout(title = 'Spectrogram of Microphone',
-                        xaxis = dict(title = 'Unix Time'),
+                        xaxis = dict(title = 'Unix Time',
+				     tickformat = 'f'),
                         yaxis = dict(title = 'Frequencies (kHz)'))
 
     return go.Figure(data = [trace], layout = layout)
