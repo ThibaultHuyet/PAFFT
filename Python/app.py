@@ -9,7 +9,7 @@ import pymongo
 import plotly.graph_objs as go
 import plotly
 import json
-from bson.json_util import dumps
+from bson.json_util import CANONICAL_JSON_OPTIONS, loads
 
 client = MongoClient()
 db = client.Audio
@@ -38,6 +38,23 @@ app.layout = html.Div([
     dcc.Interval(id = 'latency-interval-component',
                 interval = 10*1000,
                 n_intervals = 0),
+    dcc.Dropdown(id = 'performance-dropdown',
+		 options = [{'label':'Memory', 'value': 'mem'},
+			    {'label':'CPU', 'value': 'cpu'}],
+		 value = 'cpu'),
+    dcc.Dropdown(id = 'loc-perf-dropdown',
+		 options = [{'label': 'Nimbus Top Floor 1', 'value': 'Nimbus/Top/1'},
+			    {'label': 'Nimbus Top Floor 2', 'value':'Nimbus/Top/2'},
+			    {'label':'Nimbus Bot Floor 1', 'value':'Nimbus/Bot/1'},
+			    {'label': 'Nimbus Bot Floor 2', 'value':'Nimbus/Bot/2'}],
+		 value = 'Nimbus/Top/1'),
+    dcc.Dropdown(id = 'program-dropdown',
+		 options = [{'label': 'Total', 'value': 'total'},
+			    {'label': 'Shell', 'value': 'shell'},
+			    {'label': 'Program', 'value': 'program'},
+			    {'label': 'Docker', 'value' : 'dockerd'},
+			    {'label': 'Container', 'value': 'container'}],
+		 value = 'total'),
     dcc.Graph(id = 'live-power'),
     dcc.Interval(id = 'power-interval',
 		 interval = 10 * 1000,
@@ -45,15 +62,18 @@ app.layout = html.Div([
 ])
 
 @app.callback(Output('live-power', 'figure'),
-[Input('power-interval', 'n_intervals')])
-def update_power(n):
-    results = power.find({'loc': 'Nimbus/Top/1'}).limit(100).sort('time', pymongo.DESCENDING)
+[Input('power-interval', 'n_intervals'),
+Input('performance-dropdown', 'value'),
+Input('loc-perf-dropdown', 'value'),
+Input('program-dropdown', 'value')])
+def update_power(n, perf, loc, prog):
+    results = power.find({'loc': loc}).limit(100).sort('time', pymongo.DESCENDING)
 
     time = []
     total = []
     for result in results:
         time.append(result['time'])
-        total.append(result['performance']['total']['cpu'])
+        total.append(result['performance'][prog][perf])
 
     trace = go.Scatter(x = time,
                        y = total,
@@ -78,7 +98,7 @@ def update_latency(n, dropdown):
     lat = []
     for result in results:
         time.append(result['time'])
-        lat.append(result['latency'])
+        lat.append(result['latency']* 1000)
 
     trace = go.Scatter(x = time,
                         y = lat,
@@ -100,11 +120,11 @@ def update_fft_series(hoverData, dropdown):
     in the spectrograph and it will then update the FFT graph with the hovered data
     '''
     time = hoverData['points'][0]['x']
-    result = collection.find_one({'time' : time,
+    fft_slice = collection.find_one({'time' : time,
                                'loc' : dropdown})
 
-    converted = json.loads(dumps(result))
-    fft_graph = [(r + i * 1j) for r, i in zip(converted['complex']['real'], converted['complex']['imag'])]
+    fft_graph = [np.absolute(r + i * 1j) for r, i in zip(fft_slice['complex']['real'], fft_slice['complex']['imag'])]
+    fft_graph = 20 * np.log(fft_graph/np.max(fft_graph))
     
     trace = go.Scatter(x = frequencies,
                     y = fft_graph,
@@ -114,7 +134,6 @@ def update_fft_series(hoverData, dropdown):
                         xaxis = dict(title = 'Frequency (Hz)',
                                     type = 'log'),
                         yaxis = dict(title = 'dB'))
-
     return go.Figure(data = [trace], layout = layout)
 
 
@@ -140,7 +159,8 @@ def update_spectrogram(n, dropdown):
     S = np.absolute(spectrum)
     S = 20 * np.log10(S / np.max(S))
 
-    trace = go.Heatmap(x = time, y = frequencies, z = S.T)
+    trace = go.Heatmap(x = time, y = frequencies, z = S.T,
+		       hoverinfo = 'x+y')
     layout = go.Layout(title = 'Spectrogram of Microphone',
                         xaxis = dict(title = 'Unix Time',
 				     tickformat = 'f'),
