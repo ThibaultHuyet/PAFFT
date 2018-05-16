@@ -1,3 +1,5 @@
+http://ec2-52-211-33-30.eu-west-1.compute.amazonaws.com:8050/
+
 # PAFFT
 This program takes in Audio from PortAudio and then applies a FFT to the audio input. The audio input will then be sent via MQTT to be stored in a database and graphed.
 
