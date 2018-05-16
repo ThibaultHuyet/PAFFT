@@ -22,44 +22,70 @@ frequencies = np.arange(0, 22049, 5.38330078)
 app = dash.Dash()
 
 app.layout = html.Div([
-   dcc.Dropdown(id = 'loc-dropdown',
-                options = [{'label': 'Top Floor Nimbus 1', 'value': 'Nimbus/Top/1/Audio'},
-                           {'label': 'Top Floor Nimbus 2', 'value': 'Nimbus/Top/2/Audio'},
-                           {'label': 'Bottom Floor Nimbus 1', 'value': 'Nimbus/Bot/1/Audio'},
-                           {'label': 'Bottom Floor Nimbus 2', 'value': 'Nimbus/Bot/2/Audio'}],
-                value = 'Nimbus/Top/1/Audio'),
-   dcc.Graph(id = 'live-spectrograph'),
-   dcc.Interval(id = 'interval-component',
-                interval = 10 * 1000, # Graph updates every 10 seconds
-                n_intervals = 0),
+   html.Div([
+      html.H1('Nimbus Noise Levels', style = {'text-align': 'center'})
+           ]),
+   html.Div([
+      html.Div([
+         dcc.Dropdown(id = 'loc-dropdown',
+                options = [{'label': 'Nimbus Top Floor 1', 'value': 'Nimbus/Top/1/Audio'},
+                           {'label': 'Nimbus Top Floor 2', 'value': 'Nimbus/Top/2/Audio'},
+                           {'label': 'Nimbus Bot Floor 1', 'value': 'Nimbus/Bot/1/Audio'},
+                           {'label': 'Nimbus Bot Floor 2', 'value': 'Nimbus/Bot/2/Audio'}],
+                value = 'Nimbus/Top/1/Audio',
+		clearable = False)
+              ],
+         style = {'width': '20%',
+		  'margin-left': '25%'}),
 
-    dcc.Graph(id = 'fft-series'),
-    dcc.Graph(id = 'latency'),
-    dcc.Interval(id = 'latency-interval-component',
+      html.Div([
+         html.Div([
+            dcc.Graph(id = 'live-spectrograph'),
+            dcc.Interval(id = 'interval-component',
+                interval = 10 * 1000, # Graph updates every 10 seconds
+                n_intervals = 0)
+                 ],
+            style = {'display':'inline-block',
+		     'width' : 700}),
+         html.Div([
+            dcc.Graph(id = 'fft-series')
+              ],
+            style = {'display':'inline-block',
+		     'width': 500})
+	     ],
+         style = {'display':'inline-block',
+		  'height': 400,
+		  'margin-left' : 20,
+		  'margin-right': 0}),
+       dcc.Graph(id = 'latency'),
+       dcc.Interval(id = 'latency-interval-component',
                 interval = 10*1000,
                 n_intervals = 0),
-    dcc.Dropdown(id = 'performance-dropdown',
+       dcc.Dropdown(id = 'performance-dropdown',
 		 options = [{'label':'Memory', 'value': 'mem'},
 			    {'label':'CPU', 'value': 'cpu'}],
 		 value = 'cpu'),
-    dcc.Dropdown(id = 'loc-perf-dropdown',
+       dcc.Dropdown(id = 'loc-perf-dropdown',
 		 options = [{'label': 'Nimbus Top Floor 1', 'value': 'Nimbus/Top/1'},
 			    {'label': 'Nimbus Top Floor 2', 'value':'Nimbus/Top/2'},
 			    {'label':'Nimbus Bot Floor 1', 'value':'Nimbus/Bot/1'},
 			    {'label': 'Nimbus Bot Floor 2', 'value':'Nimbus/Bot/2'}],
 		 value = 'Nimbus/Top/1'),
-    dcc.Dropdown(id = 'program-dropdown',
+       dcc.Dropdown(id = 'program-dropdown',
 		 options = [{'label': 'Total', 'value': 'total'},
 			    {'label': 'Shell', 'value': 'shell'},
 			    {'label': 'Program', 'value': 'program'},
 			    {'label': 'Docker', 'value' : 'dockerd'},
 			    {'label': 'Container', 'value': 'container'}],
 		 value = 'total'),
-    dcc.Graph(id = 'live-power'),
-    dcc.Interval(id = 'power-interval',
+       dcc.Graph(id = 'live-power'),
+       dcc.Interval(id = 'power-interval',
 		 interval = 10 * 1000,
 		 n_intervals = 0)
 ])
+],
+style = {'margin-left': 0,
+	 'margin-right': 0})
 
 @app.callback(Output('live-power', 'figure'),
 [Input('power-interval', 'n_intervals'),
@@ -112,14 +138,14 @@ def update_latency(n, dropdown):
     return go.Figure(data = [trace], layout = layout)
 
 @app.callback(Output('fft-series', 'figure'),
-[Input('live-spectrograph', 'hoverData'),
+[Input('live-spectrograph', 'clickData'),
 Input('loc-dropdown', 'value')])
-def update_fft_series(hoverData, dropdown):
+def update_fft_series(clickData, dropdown):
     '''
     This is the function for allowing someone to hover over a data point
     in the spectrograph and it will then update the FFT graph with the hovered data
     '''
-    time = hoverData['points'][0]['x']
+    time = clickData['points'][0]['x']
     fft_slice = collection.find_one({'time' : time,
                                'loc' : dropdown})
 
@@ -160,12 +186,11 @@ def update_spectrogram(n, dropdown):
     S = 20 * np.log10(S / np.max(S))
 
     trace = go.Heatmap(x = time, y = frequencies, z = S.T,
-		       hoverinfo = 'x+y')
+		       hoverinfo = 'x+y', showscale = False)
     layout = go.Layout(title = 'Spectrogram of Microphone',
                         xaxis = dict(title = 'Unix Time',
 				     tickformat = 'f'),
                         yaxis = dict(title = 'Frequencies (kHz)'))
-
     return go.Figure(data = [trace], layout = layout)
 
 
