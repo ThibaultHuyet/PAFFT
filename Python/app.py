@@ -36,7 +36,7 @@ app.layout = html.Div([
 		clearable = False)
               ],
          style = {'width': '20%',
-		  'margin-left': '25%'}),
+		  'margin-left': 100}),
 
       html.Div([
          html.Div([
