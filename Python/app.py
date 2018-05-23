@@ -105,8 +105,7 @@ app.layout = html.Div([
                       'width' : '20%'})]),
 ])
 ],
-style = {'margin-left': 0,
-	 'margin-right': 0})
+style = {'backgroundColor' : '#808080' })
 
 @app.callback(Output('live-power', 'figure'),
 [Input('power-interval', 'n_intervals'),
@@ -192,7 +191,7 @@ def update_spectrogram(n, dropdown):
     Function for keeping the spectrograph to updated live
     It makes a call to a MongoDB database.
     '''
-    results = collection.find({'loc':dropdown}).limit(100).sort('time', pymongo.DESCENDING)
+    results = collection.find({'loc': 'Nimbus/Bot/1/Audio'}).limit(100).sort('time', pymongo.DESCENDING)
     
     time = []
     slices = []
