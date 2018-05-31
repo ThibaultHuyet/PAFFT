@@ -23,11 +23,14 @@ def on_message(client, userdata, msg):
     dockerd_perf = j['performance']['dockerd']
     container_perf = j['performance']['container']
     program_perf = j['performance']['program']
+    shell_perf = j['performance']['shell']
 
     updated_json = {'loc' : j['loc'],
                     'time': j['time'],
                     'performance' : {'total' : {'cpu': total_perf['cpu'],
                                                 'mem': total_perf['mem']},
+				     'shell' : {'cpu': shell_perf['cpu'],
+						'mem': shell_perf['mem']},
                                      'dockerd' :{'cpu':dockerd_perf['cpu'],
                                                  'mem':dockerd_perf['mem']},
                                      'container' : {'cpu':container_perf['cpu'],

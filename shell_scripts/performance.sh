@@ -22,8 +22,8 @@ do
 
         unix_time=$(date '+%s')
 
-        /usr/bin/mosquitto_pub -h 'localhost' -t 'local' -m '{"loc": "Nimbus/Top/2", "time":'"$unix_time"',"performance" : {"tot$
-{"cpu" :'"${totalarray[0]}"', "mem" :'"${totalarray[1]}"'}, "shell":{"cpu":'"${shellarray[1]}"', "mem":'"${shellarray[2]}"'}"dockerd" : {"cpu":
+        /usr/bin/mosquitto_pub -h 'localhost' -t 'local' -m '{"loc": "Nimbus/Top/2", "time":'"$unix_time"',"performance" : {"total":
+{"cpu" :'"${totalarray[0]}"', "mem" :'"${totalarray[1]}"'}, "shell":{"cpu":'"${shellarray[1]}"', "mem":'"${shellarray[2]}"'},"dockerd" : {"cpu":
 '"${dockerdarray[1]}"', "mem":'"${dockerdarray[2]}"'}, "container":{"cpu":
 '"${containerarray[1]}"', "mem":'"${containerarray[2]}"'},
 "program":{"cpu":'"${programarray[1]}"', "mem":'"${programarray[2]}"'}}}'
