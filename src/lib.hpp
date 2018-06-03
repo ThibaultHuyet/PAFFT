@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LIB_HPP
+#define LIB_HPP
 
 #include <fftw3.h>
 #include <string>
@@ -28,3 +29,5 @@ void remove_data(float *original, float *reduced_data, int size)
                 reduced_data[i] = original[i];
         }
 }
+
+#endif

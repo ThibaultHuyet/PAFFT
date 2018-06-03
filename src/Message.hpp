@@ -1,3 +1,6 @@
+#ifndef MESSAGE_HPP
+#define MESSAGE_HPP
+
 #include "json.hpp"
 
 #include <ctime>
@@ -30,3 +33,5 @@ class Message
         int length;
         std::string msg; // String formatted version for convenience
 };
+
+#endif
