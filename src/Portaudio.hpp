@@ -17,7 +17,7 @@ class Portaudio
 
     private:
         PaStreamParameters inputParameters;
-        PaStream *stream;
+        PaStream           *stream;
 };
 
 #endif

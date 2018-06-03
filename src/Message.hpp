@@ -29,8 +29,8 @@ class Message
         friend std::ostream& operator<<(std::ostream& os, const Message& m);
 
     private:
-        json j;
-        int length;
+        json        j;
+        int         length;
         std::string msg; // String formatted version for convenience
 };
 
