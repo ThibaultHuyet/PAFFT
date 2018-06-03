@@ -2,7 +2,7 @@
 This program takes in Audio from PortAudio and then applies a FFT to the audio input. The audio input will then be sent via MQTT to be stored in a database and graphed.
 
 ## Build && run Docker
-```Dockerfile
+```dockerfile
 docker build -t sound_sensor .
 docker run --privileged -dp 1883 sound_sensor
 ```
