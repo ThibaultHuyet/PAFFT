@@ -3,15 +3,81 @@
 #include "MQTTClient.h"                  // For sending data
 #include <string>                       // Making a message to be sent
 #include <ctime>
+#include <exception>
 #include <iostream>
 #include "lib.h"
 #include "Message.hpp"
 
-#define MQTT_TOPIC "Nimbus/..."         // Change this variable for each sensor
+#define MQTT_TOPIC "Home"         // Change this variable for each sensor
 #define MQTT_HOSTNAME "localhost"
 #define MQTT_PORT 1883
 #define CLIENTID "Thibault"             // Change this variable for each sensor
 #define TIMEOUT 2000L
+
+class Portaudio
+{
+    public:
+        Portaudio()
+        {
+            PaError err;
+            err = Pa_Initialize();
+            if (err != paNoError)
+            {
+                throw std::runtime_error("Problem starting Portaudio");
+            }
+            
+            inputParameters.device = Pa_GetDefaultInputDevice();
+            inputParameters.channelCount = 1;
+            inputParameters.sampleFormat = paFloat32;
+            inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputParameters.device) -> defaultHighInputLatency;
+            inputParameters.hostApiSpecificStreamInfo = NULL;
+        }
+        
+        ~Portaudio()
+        {
+            Pa_Terminate();
+        }
+
+        PaStreamParameters* get_parameters()
+        {
+            return &inputParameters;
+        }
+
+        void open_stream(unsigned long size, double sample_rate, PaStreamFlags flag)
+        {
+            PaError err;
+            err = Pa_OpenStream(&stream, &inputParameters, nullptr, sample_rate, size, flag, nullptr, nullptr);
+            if (err != paNoError)
+            {
+                throw std::runtime_error("Could not open Portaudio stream");
+            }
+        }
+
+        void start_stream()
+        {
+            PaError err;
+            err = Pa_StartStream(stream);
+
+            if (err != paNoError)
+            {
+                throw std::runtime_error("Could not Start Portaudio stream");
+            }
+        }
+
+        void read_stream(float *data, int size)
+        {
+            PaError err;
+            err = Pa_ReadStream(stream, data, size);
+            if (err != paNoError)
+            {
+                throw std::runtime_error("Could not read data from Portaudio stream");
+            }
+        }
+
+    private:
+        PaStreamParameters inputParameters;
+        PaStream *stream;
+};
 
 int main()
 {
@@ -45,10 +111,6 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    PaStreamParameters inputParameters;                 // Input parameters for working with PortAudio
-    PaError err = 0;                                    // err is for error checking
-    PaStream *stream;                                   // Stream object created by PortAudio
-
     // data is going to be where audio data is stored
     // data will be the input to fft
     // out will be the output
@@ -58,43 +120,9 @@ int main()
     float message[fft_size/2];
 
     // Initialize PortAudio
-    err = Pa_Initialize();
-    if (err != paNoError)
-    {
-        std::cout << "Problem initializing PortAudio\n";
-        exit(-1);
-    }
-
-    // Define the kind of input devcie that we will be using for taking in audio
-    inputParameters.device = Pa_GetDefaultInputDevice();
-    inputParameters.channelCount = 1;
-    inputParameters.sampleFormat = paFloat32;
-    inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputParameters.device) -> defaultHighInputLatency;
-    inputParameters.hostApiSpecificStreamInfo = NULL;
-    
-    // Start the audio stream.
-    err = Pa_OpenStream(&stream,                // Stream used for input
-                        &inputParameters,       // Structure used to describe input parameters used by stream
-                        NULL,                   // outputparameters: Since this is input only, this is NULL
-                        sample_rate,            // sample rate
-                        fft_size,               // frames per buffer
-                        paClipOff,              // Not bothering to clip samples
-                        NULL,                   // Using blocking API for now, so no callback or callback data
-                        NULL                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                        );
-
-    if (err != paNoError)
-    {
-        std::cout << "Problem opening PortAudio stream\n";
-        exit(-1);
-    }
-
-    err = Pa_StartStream(stream);
-    if (err != paNoError)
-    {
-        std::cout << "Problem starting PortAudio stream\n";
-        exit(-1);
-    }
+    Portaudio PA;
+    PA.open_stream(fft_size, sample_rate, paClipOff);
+    PA.start_stream();
     
     int pt = 0;
     float lat = 0; // Latency variable
@@ -108,7 +136,7 @@ int main()
             fftwf_plan plan = fftwf_plan_dft_r2c_1d(fft_size, data, out, FFTW_ESTIMATE);        
             
             // Pa_ReadStream is a blocking call to take in mic input
-            err = Pa_ReadStream(stream, data, fft_size);
+            PA.read_stream(data, fft_size);
             fftwf_execute(plan);
 
             // Here, I prepare the message that will be sent over MQTT
@@ -134,10 +162,6 @@ int main()
             Pa_Sleep(1000);
         }
     }
-
-    err = Pa_Terminate();
-    if (err != paNoError)
-        printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 
     MQTTClient_disconnect(client, 10000);
     MQTTClient_destroy(&client);
