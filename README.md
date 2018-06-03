@@ -4,7 +4,6 @@ This program takes in Audio from PortAudio and then applies a FFT to the audio i
 ## Build && run Docker
 ```
 docker build -t sound_sensor .
-
 docker run --privileged -dp 1883 sound_sensor
 ```
 ## Libraries Used
@@ -16,6 +15,8 @@ docker run --privileged -dp 1883 sound_sensor
 ### Python
 1. [Plotly](https://plot.ly/)
 2. [MQTT](http://www.eclipse.org/paho/)
+3. [PyMongo](https://www.mongodb.com/)
+4. [NumPy](http://www.numpy.org/)
 
 ## Circuit Diagram
 ![Image provided by Adafruit](https://cdn-learn.adafruit.com/assets/assets/000/039/636/original/sensors_pi_i2s_bb.png?1487800378)
@@ -26,12 +27,7 @@ docker run --privileged -dp 1883 sound_sensor
 
 
 ## To Do
-1. Improve graphs
-2. Add synchronization
-3. Commit changes that allow for sending to AWS
-4. Graph data of multiple devices running synchronously
-2. Get data
-3. Perform tests
+1. Add a filter that filters data before sending it out.
 
 ## Bugs
 1. There seems to be an issue with Jackd server just not starting after a while of using Docker or program. To fix, you can just use the command jackd -d dummy. jackd -d alsa has bugs for some reason.
