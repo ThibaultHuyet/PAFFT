@@ -1,19 +1,16 @@
 #include <fftw3.h>                      // For performing fft
 #include "Portaudio.hpp"
-#include <string>                       // Making a message to be sent
 #include <ctime>
-#include <iostream>
 #include "lib.hpp"
 #include "Message.hpp"
 #include "MQTT.hpp"
 
 int main()
 {
-    int fft_size = 8192;
+    int fft_size    = 8192;
     int sample_rate = 44100;
-    // Applying a fft transform on data halves the amount of data available
-    int fft_result = (fft_size) / 2;
-    int qos = 0;
+    int fft_result  = (fft_size) / 2;
+    int qos         = 0;
 
 
     // Initialize the mosquitto client that will be used
@@ -22,17 +19,16 @@ int main()
     // data is going to be where audio data is stored
     // data will be the input to fft
     // out will be the output
-    float data[fft_size];
+    float         data[fft_size];
     fftwf_complex out[fft_size / 2];
-
-    float message[fft_size/2];
+    float         message[fft_size/2];
 
     // Initialize PortAudio
     Portaudio PA;
     PA.open_stream(fft_size, sample_rate, paClipOff);
     PA.start_stream();
     
-    int pt = 0;
+    int   pt = 0;
     float lat = 0; // Latency variable
     while (true)
     {
@@ -53,6 +49,7 @@ int main()
             clock_t time_before_publish = clock();
             mqtt.publish_message(m, "new_mqtt", qos);
             clock_t time_after_publish = clock();
+            
             clock_t diff = time_after_publish - time_before_publish;
             lat = ((float)diff)/CLOCKS_PER_SEC;
 
