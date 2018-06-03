@@ -1,3 +1,6 @@
+#ifndef PORTAUDIO_HPP
+#define PORTAUDIO_HPP
+
 #include <portaudio.h>
 #include <exception>
 #include <iostream>
@@ -8,7 +11,6 @@ class Portaudio
         Portaudio();
         ~Portaudio();
 
-        PaStreamParameters* get_parameters();
         void open_stream(unsigned long size, double sample_rate, PaStreamFlags flag);
         void start_stream();
         void read_stream(float *data, int size);
@@ -17,3 +19,5 @@ class Portaudio
         PaStreamParameters inputParameters;
         PaStream *stream;
 };
+
+#endif

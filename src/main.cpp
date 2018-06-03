@@ -1,18 +1,11 @@
 #include <fftw3.h>                      // For performing fft
-#include <portaudio.h>                  // For audio sampling
 #include "Portaudio.hpp"
-#include "MQTTClient.h"                  // For sending data
 #include <string>                       // Making a message to be sent
 #include <ctime>
 #include <iostream>
-#include "lib.h"
+#include "lib.hpp"
 #include "Message.hpp"
-
-#define MQTT_TOPIC "Home"         // Change this variable for each sensor
-#define MQTT_HOSTNAME "localhost"
-#define MQTT_PORT 1883
-#define CLIENTID "Thibault"             // Change this variable for each sensor
-#define TIMEOUT 2000L
+#include "MQTT.hpp"
 
 int main()
 {
@@ -24,27 +17,7 @@ int main()
 
 
     // Initialize the mosquitto client that will be used
-    MQTTClient client;
-    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
-    MQTTClient_message pubmsg = MQTTClient_message_initializer;
-    MQTTClient_deliveryToken token;
-    
-    int rc;
-
-    MQTTClient_create(&client,
-                    MQTT_HOSTNAME,
-                    CLIENTID,
-                    MQTTCLIENT_PERSISTENCE_NONE,
-                    NULL);
-
-    conn_opts.keepAliveInterval = 20;
-    conn_opts.cleansession = 1;
-
-    if ((rc = MQTTClient_connect(client, &conn_opts)) != MQTTCLIENT_SUCCESS)
-    {
-        printf("Failed to connect, return code %d\n", rc);
-        exit(EXIT_FAILURE);
-    }
+    MQTT mqtt("localhost", "Nimbus1");
 
     // data is going to be where audio data is stored
     // data will be the input to fft
@@ -75,16 +48,10 @@ int main()
             fftwf_execute(plan);
 
             // Here, I prepare the message that will be sent over MQTT
-            Message m(MQTT_TOPIC, out, fft_result, t, lat);
+            Message m("new_mqtt", out, fft_result, t, lat);
             
-            pubmsg.payload = m.get_message();
-            pubmsg.payloadlen = m.get_length();
-            pubmsg.qos = qos;
-            pubmsg.retained = 0;
-
             clock_t time_before_publish = clock();
-            MQTTClient_publishMessage(client, MQTT_TOPIC, &pubmsg, &token);
-            rc = MQTTClient_waitForCompletion(client, token, TIMEOUT);
+            mqtt.publish_message(m, "new_mqtt", qos);
             clock_t time_after_publish = clock();
             clock_t diff = time_after_publish - time_before_publish;
             lat = ((float)diff)/CLOCKS_PER_SEC;
@@ -97,9 +64,5 @@ int main()
             Pa_Sleep(1000);
         }
     }
-
-    MQTTClient_disconnect(client, 10000);
-    MQTTClient_destroy(&client);
-
     return 0;
 }

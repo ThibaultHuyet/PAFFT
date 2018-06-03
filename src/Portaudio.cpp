@@ -21,11 +21,6 @@ Portaudio::~Portaudio()
     Pa_Terminate();
 }
 
-PaStreamParameters* Portaudio::get_parameters()
-{
-    return &inputParameters;
-}
-
 void Portaudio::open_stream(unsigned long size, double sample_rate, PaStreamFlags flag)
 {
     PaError err;
