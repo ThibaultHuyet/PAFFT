@@ -1,16 +1,17 @@
-FROM resin/rpi-raspbian:jessie
-MAINTAINER thibault.huyet@gmail.com
+FROM resin/rpi-raspbian:jessie AS builder
+LABEL maintainer thibault.huyet@gmail.com
 
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
+    git \
     libasound-dev \
+    libmosquitto-dev \
+    libssl-dev \    
     mosquitto \
     mosquitto-clients \
-    libmosquitto-dev \
     portaudio19-dev \
-    git \
-    libssl-dev
+    && rm -rf /var/lib/apt/lists/*
 
 ADD fftw-3.3.7.tar.gz /
 RUN cd fftw-3.3.7 \
@@ -23,11 +24,14 @@ RUN git clone https://github.com/rpoisel/paho.mqtt.c.git
 RUN cd paho.mqtt.c \
     make && make install
 
-RUN cd ..
-COPY . /
 WORKDIR /
+COPY . /
+RUN make
 
+FROM resin/rpi-raspbian:jessie
+
+WORKDIR /
+COPY --from=builder / /
 EXPOSE 1883
 
-RUN make
 CMD ["./main"]
