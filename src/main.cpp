@@ -1,9 +1,13 @@
+#include <armadillo>
 #include <fftw3.h>                      // For performing fft
 #include "Portaudio.hpp"
 #include <ctime>
 #include "lib.hpp"
 #include "Message.hpp"
 #include "MQTT.hpp"
+#include "sigpack.h"
+
+using namespace sp;
 
 int main()
 {
@@ -13,6 +17,17 @@ int main()
     int qos         = 0;
 
 
+    arma::vec e(fft_size, arma::fill::zeros);
+    arma::vec d(fft_size, arma::fill::zeros);
+    arma::vec y(fft_size, arma::fill::zeros);
+
+    FIR_filt<double, double, double> G;
+    FIR_filt<double, double, double> Ghat;
+    arma::vec b = "-0.2 -0.1 0.1 0.3 0.7";
+    G.set_coeffs(b);
+    Ghat.setup_lms(12, 0.8);
+
+
     // Initialize the mosquitto client that will be used
     MQTT mqtt("localhost", "Nimbus1");
 
@@ -20,8 +35,9 @@ int main()
     // data will be the input to fft
     // out will be the output
     float         data[fft_size];
-    fftwf_complex out[fft_size / 2];
+    fftw_complex  out[fft_size / 2];
     float         message[fft_size/2];
+    float         *filtered;
 
     // Initialize PortAudio
     Portaudio PA;
@@ -37,11 +53,31 @@ int main()
         {    
             pt = t;
             // Create the fftw plan
-            fftwf_plan plan = fftwf_plan_dft_r2c_1d(fft_size, data, out, FFTW_ESTIMATE);        
+            fftw_plan plan = fftw_plan_dft_r2c_1d(fft_size, y.memptr(), out, FFTW_ESTIMATE);        
             
             // Pa_ReadStream is a blocking call to take in mic input
             PA.read_stream(data, fft_size);
-            fftwf_execute(plan);
+
+            // Have to do this really dumb solution as initialization attempts
+            // have caused segmentation faults saying the size of data is 
+            // incompatible with x
+            arma::vec x(fft_size, arma::fill::zeros);
+            for (int n = 0; n < fft_size; n++)
+            {
+                x(n) = data[n];
+            }
+
+            d = G.filter(x);
+
+            for (int n = 0; n < fft_size; n++)
+            {
+                y(n) = Ghat(x(n));
+                e(n) = d(n) - y(n);
+
+                Ghat.lms_adapt(e(n));
+            }
+
+            fftw_execute(plan);
 
             // Here, I prepare the message that will be sent over MQTT
             Message m("new_mqtt", out, fft_result, t, lat);

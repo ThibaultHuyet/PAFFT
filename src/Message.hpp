@@ -17,7 +17,7 @@ class Message
         Message(std::string loc, float *data, int size);
         Message(std::string loc, float *data, int size, int ctime);
         Message(std::string loc, float *data, int size, int ctime, int temperature);
-        Message(std::string loc, fftwf_complex *out, int size, int ctime, float lat);
+        Message(std::string loc, fftw_complex *out, int size, int ctime, float lat);
         // For sending just a time value
         Message(std::string loc, int ctime);
 
