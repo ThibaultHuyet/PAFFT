@@ -33,7 +33,12 @@ app.layout = html.Div([
                            {'label': 'Nimbus Bot Floor 1', 'value': 'Nimbus/Bot/1/Audio'},
                            {'label': 'Nimbus Bot Floor 2', 'value': 'Nimbus/Bot/2/Audio'}],
                 value = 'Nimbus/Top/1/Audio',
-		clearable = False)
+		clearable = False),
+        dcc.RangeSlider(id = 'value-limit',
+                        min = 50,
+                        max = 500,
+                        step = 50,
+                        value = [100, 50])
               ],
          style = {'width': '20%',
 		  'margin-left': 100}),
@@ -185,13 +190,14 @@ def update_fft_series(clickData, dropdown):
 
 @app.callback(Output('live-spectrograph', 'figure'),
             [Input('interval-component', 'n_intervals'),
-             Input('loc-dropdown', 'value')])
-def update_spectrogram(n, dropdown):
+             Input('loc-dropdown', 'value'),
+             Input('value-limit', 'value')])
+def update_spectrogram(n, dropdown, value):
     '''
     Function for keeping the spectrograph to updated live
     It makes a call to a MongoDB database.
     '''
-    results = collection.find({'loc': 'Nimbus/Bot/1/Audio'}).limit(100).sort('time', pymongo.DESCENDING)
+    results = collection.find({'loc': dropdown}).limit(value[0]).sort('time', pymongo.DESCENDING)
     
     time = []
     slices = []
