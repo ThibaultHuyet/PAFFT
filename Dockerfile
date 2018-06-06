@@ -1,5 +1,5 @@
 FROM resin/rpi-raspbian:jessie
-MAINTAINER thibault.huyet@gmail.com
+LABEL maintainer thibault.huyet@gmail.com
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -7,10 +7,15 @@ RUN apt-get update && apt-get install -y \
     libasound-dev \
     mosquitto \
     mosquitto-clients \
+    libarmadillo-dev \
+    libblas-dev \
+    liblapack-dev \
     libmosquitto-dev \
     portaudio19-dev \
     git \
     libssl-dev
+
+ADD sigpack-1.2.4.zip /
 
 ADD fftw-3.3.7.tar.gz /
 RUN cd fftw-3.3.7 \

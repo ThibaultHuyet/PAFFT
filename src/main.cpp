@@ -11,6 +11,10 @@ using namespace sp;
 
 int main()
 {
+    std::string address = "localhost";
+    std::string client  = "Nimbus1";
+    std::string loc     = "filt";
+
     int fft_size    = 8192;
     int sample_rate = 44100;
     int fft_result  = (fft_size) / 2;
@@ -25,11 +29,11 @@ int main()
     FIR_filt<double, double, double> Ghat;
     arma::vec b = "-0.2 -0.1 0.1 0.3 0.7";
     G.set_coeffs(b);
-    Ghat.setup_lms(12, 0.8);
+    Ghat.setup_rls(5, 0.95, 50);
 
 
     // Initialize the mosquitto client that will be used
-    MQTT mqtt("localhost", "Nimbus1");
+    MQTT mqtt(address, client);
 
     // data is going to be where audio data is stored
     // data will be the input to fft
@@ -74,16 +78,16 @@ int main()
                 y(n) = Ghat(x(n));
                 e(n) = d(n) - y(n);
 
-                Ghat.lms_adapt(e(n));
+                Ghat.rls_adapt(e(n));
             }
 
             fftw_execute(plan);
 
             // Here, I prepare the message that will be sent over MQTT
-            Message m("new_mqtt", out, fft_result, t, lat);
+            Message m(loc, out, fft_result, t, lat);
             
             clock_t time_before_publish = clock();
-            mqtt.publish_message(m, "new_mqtt", qos);
+            mqtt.publish_message(m, loc, qos);
             clock_t time_after_publish = clock();
             
             clock_t diff = time_after_publish - time_before_publish;

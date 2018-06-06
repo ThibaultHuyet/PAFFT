@@ -5,4 +5,4 @@ LIBS = -lrt -lm -lasound -lpthread -lportaudio -lfftw3 -lm -lpaho-mqtt3c -larmad
 INCLUDES = -Isigpack-1.2.4/sigpack
 
 main: $(SRC)
-	$(CC) -std=c++14 $(SRC) $(LIBS) $(INCLUDES) -o main -g
+	$(CC) -std=c++14 $(SRC) $(LIBS) $(INCLUDES) -o main
