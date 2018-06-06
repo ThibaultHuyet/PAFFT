@@ -191,7 +191,7 @@ def update_spectrogram(n, dropdown):
     Function for keeping the spectrograph to updated live
     It makes a call to a MongoDB database.
     '''
-    results = collection.find({'loc': 'Nimbus/Bot/1/Audio'}).limit(100).sort('time', pymongo.DESCENDING)
+    results = collection.find({'loc': dropdown}).limit(100).sort('time', pymongo.DESCENDING)
     
     time = []
     slices = []
