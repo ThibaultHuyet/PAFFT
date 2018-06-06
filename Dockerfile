@@ -1,4 +1,4 @@
-FROM resin/rpi-raspbian:jessie
+FROM ubuntu AS builder
 LABEL maintainer thibault.huyet@gmail.com
 
 RUN apt-get update && apt-get install -y \
@@ -15,11 +15,9 @@ RUN apt-get update && apt-get install -y \
     git \
     libssl-dev
 
-ADD sigpack-1.2.4.zip /
-
 ADD fftw-3.3.7.tar.gz /
 RUN cd fftw-3.3.7 \
-    && ./configure --enable-float && make \
+    && ./configure && make \
     && make install
 
 RUN cd ..
@@ -29,10 +27,17 @@ RUN cd paho.mqtt.c \
     make && make install
 
 RUN cd ..
-COPY . /
-WORKDIR /
 
+ADD sigpack-1.2.4.zip /
+
+WORKDIR /
+COPY . /
+RUN make
+
+FROM ubuntu
+
+WORKDIR /
+COPY --from=builder / / 
 EXPOSE 1883
 
-RUN make
 CMD ["./main"]
