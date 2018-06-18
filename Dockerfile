@@ -1,4 +1,4 @@
-FROM ubuntu AS builder
+FROM resin/rpi-raspbian:jessie AS builder
 LABEL maintainer thibault.huyet@gmail.com
 
 RUN apt-get update && apt-get install -y \
@@ -34,10 +34,6 @@ WORKDIR /
 COPY . /
 RUN make
 
-FROM ubuntu
-
-WORKDIR /
-COPY --from=builder / / 
 EXPOSE 1883
 
 CMD ["./main"]
