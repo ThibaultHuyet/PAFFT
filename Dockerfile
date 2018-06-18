@@ -27,11 +27,6 @@ RUN cd paho.mqtt.c \
 WORKDIR /
 COPY . /
 RUN make
-
-FROM resin/rpi-raspbian:jessie
-
-WORKDIR /
-COPY --from=builder / /
 EXPOSE 1883
 
 CMD ["./main"]
