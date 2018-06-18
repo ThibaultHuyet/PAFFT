@@ -1,4 +1,5 @@
 #include "MQTT.hpp"
+#include <stdexcept>
 
 MQTT::MQTT(std::string address, std::string client_id)
 {

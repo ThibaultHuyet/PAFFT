@@ -1,4 +1,5 @@
 #include "Portaudio.hpp"
+#include <stdexcept>
 
 Portaudio::Portaudio()
 {
@@ -42,12 +43,22 @@ void Portaudio::start_stream()
     }
 }
 
-void Portaudio::read_stream(float *data, int size)
+void Portaudio::read_stream(float *data, unsigned long size)
 {
     PaError err;
     err = Pa_ReadStream(stream, data, size);
     if (err != paNoError)
     {
-        throw std::runtime_error("Could not read data from Portaudio stream");
+        throw std::runtime_error(Pa_GetErrorText(err));
+    }
+}
+
+void Portaudio::stop_stream()
+{
+    PaError err;
+    err = Pa_StopStream(stream);
+    if (err != paNoError)
+    {
+	throw std::runtime_error(Pa_GetErrorText(err));
     }
 }
