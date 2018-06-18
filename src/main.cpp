@@ -46,7 +46,6 @@ int main()
     // Initialize PortAudio
     Portaudio PA;
     PA.open_stream(fft_size, sample_rate, paClipOff);
-    PA.start_stream();
     
     int   pt = 0;
     float lat = 0; // Latency variable
@@ -56,6 +55,7 @@ int main()
         if (t - pt > 4 && t % 5 == 0)
         {    
             pt = t;
+	    PA.start_stream();
             // Create the fftw plan
             fftw_plan plan = fftw_plan_dft_r2c_1d(fft_size, y.memptr(), out, FFTW_ESTIMATE);        
             
@@ -82,7 +82,7 @@ int main()
             }
 
             fftw_execute(plan);
-
+	    PA.stop_stream();
             // Here, I prepare the message that will be sent over MQTT
             Message m(loc, out, fft_result, t, lat);
             
