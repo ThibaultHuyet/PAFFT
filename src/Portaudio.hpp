@@ -13,8 +13,8 @@ class Portaudio
 
         void open_stream(unsigned long size, double sample_rate, PaStreamFlags flag);
         void start_stream();
-        void read_stream(float *data, int size);
-
+        void read_stream(float *data, unsigned long size);
+	void stop_stream();
     private:
         PaStreamParameters inputParameters;
         PaStream           *stream;
