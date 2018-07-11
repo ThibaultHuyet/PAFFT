@@ -4,3 +4,4 @@ main
 tls
 fftw-3.3.7
 sigpack-1.2.4
+*.out
