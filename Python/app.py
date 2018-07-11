@@ -17,6 +17,11 @@ db = client.Audio
 collection = db.fft
 power = db.power
 
+day = db.day
+
+locations = collection.find().distinct('loc')
+
+
 frequencies = np.arange(0, 22049, 5.38330078)
 
 app = dash.Dash()
@@ -28,17 +33,19 @@ app.layout = html.Div([
    html.Div([
       html.Div([
          dcc.Dropdown(id = 'loc-dropdown',
-                options = [{'label': 'Nimbus Top Floor 1', 'value': 'Nimbus/Top/1/Audio'},
-                           {'label': 'Nimbus Top Floor 2', 'value': 'Nimbus/Top/2/Audio'},
-                           {'label': 'Nimbus Bot Floor 1', 'value': 'Nimbus/Bot/1/Audio'},
-                           {'label': 'Nimbus Bot Floor 2', 'value': 'Nimbus/Bot/2/Audio'}],
-                value = 'Nimbus/Top/1/Audio',
+                options = [{'label' : i, 'value' : i} for i in locations],
+                value = 'Home/LivingRoom/1/Audio',
 		clearable = False),
         dcc.RangeSlider(id = 'value-limit',
                         min = 50,
-                        max = 500,
+                        max = 1000,
                         step = 50,
-                        value = [100, 50])
+                        value = [100, 300],
+			allowCross = False,
+			marks = {50 : {'label' : '50'},
+				100 : {'label' : '100'},
+				500 : {'label' : '500'},
+				750: {'label' : '750'}})
               ],
          style = {'width': '20%',
 		  'margin-left': 100}),
@@ -197,8 +204,10 @@ def update_spectrogram(n, dropdown, value):
     Function for keeping the spectrograph to updated live
     It makes a call to a MongoDB database.
     '''
-    results = collection.find({'loc': dropdown}).limit(value[0]).sort('time', pymongo.DESCENDING)
-    
+    if dropdown == 'Home/LivingRoom/1/Audio':
+        results = day.find({'loc': dropdown}).limit(value[0]).sort('time', pymongo.DESCENDING)
+    else:
+        results = collection.find({'loc': dropdown}).limit(value[0]).sort('time', pymongo.DESCENDING)
     time = []
     slices = []
     for result in results:
